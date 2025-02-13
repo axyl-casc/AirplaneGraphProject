@@ -1,6 +1,6 @@
 
 
-function parseDistanceMatrix(matrixFile) {
+function parseDistanceMatrix(matrixData) {
     //stuff
 }
 
