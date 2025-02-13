@@ -1,9 +1,7 @@
 [
-    {"id": "P001", "weight": 100, "arrival_time": "00:34", "destination": 2},
-    {"id": "P002", "weight": 150, "arrival_time": "12:34", "destination": 3},
-    {"id": "P003", "weight": 80, "arrival_time": "23:55", "destination": 1},
-    {"id": "P004", "weight": 200, "arrival_time": "22:45", "destination": 4},
-    {"id": "P005", "weight": 50, "arrival_time": "09:34", "destination": 5}
+  { "id": 1, "weight": 100, "arrivalTime": "00:34", "destination": 2 },
+  { "id": 2, "weight": 150, "arrivalTime": "12:34", "destination": 3 },
+  { "id": 3, "weight": 80, "arrivalTime": "23:55", "destination": 1 },
+  { "id": 4, "weight": 200, "arrivalTime": "22:45", "destination": 4 },
+  { "id": 5, "weight": 50, "arrivalTime": "09:34", "destination": 5 }
 ]
-
-  
