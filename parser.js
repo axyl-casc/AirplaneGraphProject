@@ -1,7 +1,9 @@
 
 
 function parseDistanceMatrix(matrixData) {
-    //stuff
+    let airports = [[]];
+    
+    
 }
 
 function parsePackageData(packageData) {
