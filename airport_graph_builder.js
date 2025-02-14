@@ -93,4 +93,4 @@ function buildAirportNetwork(distanceMatrix) {
 	return airports;
 }
 
-module.exports = { buildAirportNetwork, Airport };
+module.exports = { buildAirportNetwork, Airport, shortestDistanceMatrix };

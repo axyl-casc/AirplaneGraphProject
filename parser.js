@@ -235,7 +235,7 @@ function verifyPackageStructure(packageData) {
  * @param {string} errorMessage - error message to be printed before exiting
  */
 function printErrorAndExit(errorMessage) {
-	console.error(errorMessage);
+	console.log(errorMessage);
 	process.exit(-1);
 }
 
