@@ -8,9 +8,8 @@ class Package {
         this.weight       = singlePackageData.weight;
         this.arrivalTime  = convertStringToInt(singlePackageData.arrivalTime);
         this.deadlineTime = this.arrivalTime + TIME_LIMIT;
-        this.destination     = singlePackageData.destination;
+        this.destination  = singlePackageData.destination;
     }
-
 
 }
 /*  
