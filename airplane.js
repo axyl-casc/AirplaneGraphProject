@@ -12,17 +12,28 @@ class Airplane {
 	 *
 	 *  Details: fills in a planes weight capacity and removes weight from the Package, or removes it if necessary.
 	 *
-	 *  Returns: a boolean value indicating whether to remove the Package or not.
+	 *  Returns: a boolean value indicating whether taking the package was successful
 	 */
 	takePackage(temooPackage) {
 		let remainingCapacity = this.weightCapacity - this.sumPackagesOnPlane();
-		//this.weightCapacity
-	}
-
-	sumPackagesOnPlane(temooPackages) {
-		let sum = 0;
-		for (let temooPackage of temooPackages) {
-			sum += temooPackage.weight;
+		if (remainingCapacity - temooPackage.weight >= 0) {
+			this.weightCapacity -= temooPackage.weight;
+			temooPackage.weight = 0;
+			return true;
+		} else {
+			return false;
 		}
 	}
+
+	sumPackagesOnPlane() {
+		let sum = 0;
+		for (let temooPackage of this.temooPackages) {
+			sum += temooPackage.weight;
+		}
+		return sum;
+	}
 }
+
+let plane = new Airplane(5, 500);
+console.log(plane);
+plane.takePackage();
