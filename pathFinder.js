@@ -1,33 +1,56 @@
+const TIME_LIMIT = 24 * 60; // 24 hours in minutes
 
 /**
- * Schedules deliveries for planes using the precomputed airport graph.
+ * Schedules deliveries for a single plane using the precomputed airport graph.
  * @param {Airport[]} graph - The airport network with shortest paths.
- * @param {Object[]} packages - Array of package objects {id, weight, destination}.
- * @param {Object[]} planes - Array of plane objects {id, weight_capacity}.
- * @returns {Object[]} - Array of flight schedules for each plane.
+ * @param {Package[]} packages - Array of package objects.
+ * @param {number} current_time - The current time in minutes.
+ * @param {Airplane} plane - The single airplane object.
+ * @returns {Object} - Flight schedule for the plane.
  */
+
 function scheduleDeliveries(graph, packages, current_time, plane) {
-    // plane is for only one plane
-    // current_time so only packages with an arrival time lower than current_time are allowed
-    const hub = 0; // Assuming the hub is airport 0
-    const scheduledFlights = [];
+    const hub = 0; // Central hub airport ID
+    const planeSchedule = [];
 
-    for (const plane of planes) {
-        let remainingPackages = [...packages];
-        const planeSchedule = [];
+    console.log("Starting delivery scheduling...");
 
-        while (remainingPackages.length > 0) {
-            const routePlan = findBestRoute(graph, remainingPackages, plane, hub);
-            if (!routePlan) break; // No feasible route found
+    while (packages.length > 0) {
+        console.log("Current time:", current_time);
+        console.log("Remaining packages:", packages.length);
 
-            planeSchedule.push(routePlan);
-            remainingPackages = remainingPackages.filter(pkg => !routePlan.packages.includes(pkg.id));
+        // Calculate deadlineTime dynamically
+        let availablePackages = packages.filter(pkg => 
+            pkg.arrivalTime <= current_time && (pkg.arrivalTime + TIME_LIMIT) >= current_time
+        );
+
+        console.log("Available packages for this iteration:", availablePackages.length);
+
+        if (availablePackages.length === 0) {
+            // If no packages are available, fast forward to the next package arrival
+            current_time = Math.min(...packages.map(pkg => pkg.arrivalTime));
+            console.log("No available packages. Fast-forwarding time to:", current_time);
+            continue;
         }
 
-        scheduledFlights.push({ plane: plane.id, flights: planeSchedule });
+        const routePlan = findBestRoute(graph, availablePackages, plane, hub, current_time);
+
+        if (!routePlan) {
+            console.log("No valid route found. Ending scheduling.");
+            break;
+        }
+
+        console.log("Planned route:", routePlan);
+        planeSchedule.push(routePlan);
+        current_time += routePlan.distance; // Advance time based on flight duration
+
+        // Remove delivered packages
+        packages = packages.filter(pkg => !routePlan.packages.includes(pkg.id));
+        console.log("Packages after delivery:", packages.length);
     }
 
-    return scheduledFlights;
+    console.log("Final delivery schedule:", planeSchedule);
+    return { plane: plane.id, flights: planeSchedule };
 }
 
 /**
@@ -40,7 +63,10 @@ function scheduleDeliveries(graph, packages, current_time, plane) {
  * @returns {Object|null} - Best route with package details or null if no route found.
  */
 function findBestRoute(graph, packages, plane, hub) {
-    const selectedPackages = selectPackages(packages, plane.weight_capacity);
+    console.log("Finding best route for plane:", plane.id);
+    const selectedPackages = selectPackages(packages, plane.weightCapacity);
+    console.log("Selected packages for delivery:", selectedPackages);
+
     if (selectedPackages.length === 0) return null;
 
     // Get shortest paths using precomputed graph data
@@ -54,6 +80,7 @@ function findBestRoute(graph, packages, plane, hub) {
         totalDistance += graph[from].connections.get(to).distance;
     }
 
+    console.log("Computed route distance:", totalDistance);
     return {
         route,
         packages: selectedPackages.map(pkg => pkg.id),
@@ -71,10 +98,12 @@ function selectPackages(packages, capacity) {
     let totalWeight = 0;
     const selected = [];
 
+    console.log("Selecting packages within weight capacity:", capacity);
     for (const pkg of packages) {
         if (totalWeight + pkg.weight <= capacity) {
             selected.push(pkg);
             totalWeight += pkg.weight;
+            console.log(`Package ${pkg.id} added. Total weight:`, totalWeight);
         }
     }
 
@@ -82,4 +111,3 @@ function selectPackages(packages, capacity) {
 }
 
 module.exports = { scheduleDeliveries };
-
