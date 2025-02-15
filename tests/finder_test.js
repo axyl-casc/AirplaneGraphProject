@@ -25,7 +25,7 @@ const planes = [
 const graph = buildAirportNetwork(distanceMatrix);
 
 // Run the delivery scheduler
-const deliveryPlan = scheduleDeliveries(graph, packages, 0, planes[0]); // ✅ Passes a single plane
+const deliveryPlan = scheduleDeliveries(graph, packages, 40, planes[0]); // ✅ Passes a single plane
 
 // Output the delivery plan
 console.log(JSON.stringify(deliveryPlan, null, 2));
