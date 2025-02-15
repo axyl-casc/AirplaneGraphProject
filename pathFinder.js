@@ -10,46 +10,28 @@ const TIME_LIMIT = 24 * 60; // 24 hours in minutes
  */
 
 function scheduleDeliveries(graph, packages, current_time, plane) {
-	const hub = 0; // Central hub airport ID
+	const hub = 0;
 	const planeSchedule = [];
 
-	console.log('Starting delivery scheduling...');
-
 	while (packages.length > 0) {
-		console.log('Current time:', current_time);
-		console.log('Remaining packages:', packages.length);
-
-		// Calculate deadlineTime dynamically
 		let availablePackages = packages.filter(
-			(pkg) => pkg.arrivalTime <= current_time && pkg.arrivalTime + TIME_LIMIT >= current_time,
+			(pkg) => pkg.arrivalTime <= current_time && current_time <= pkg.arrivalTime + TIME_LIMIT,
 		);
 
-		console.log('Available packages for this iteration:', availablePackages.length);
-
 		if (availablePackages.length === 0) {
-			// If no packages are available, fast forward to the next package arrival
 			current_time = Math.min(...packages.map((pkg) => pkg.arrivalTime));
-			console.log('No available packages. Fast-forwarding time to:', current_time);
 			continue;
 		}
 
 		const routePlan = findBestRoute(graph, availablePackages, plane, hub, current_time);
+		if (!routePlan) break;
 
-		if (!routePlan) {
-			console.log('No valid route found. Ending scheduling.');
-			break;
-		}
-
-		console.log('Planned route:', routePlan);
 		planeSchedule.push(routePlan);
-		current_time += routePlan.distance; // Advance time based on flight duration
+		current_time = routePlan.time; // Correctly update to flight's end time
 
-		// Remove delivered packages
 		packages = packages.filter((pkg) => !routePlan.packages.includes(pkg.id));
-		console.log('Packages after delivery:', packages.length);
 	}
 
-	console.log('Final delivery schedule:', planeSchedule);
 	return { plane: plane.id, flights: planeSchedule };
 }
 
@@ -62,16 +44,12 @@ function scheduleDeliveries(graph, packages, current_time, plane) {
  * @param {number} hub - The central hub airport ID.
  * @returns {Object|null} - Best route with package details or null if no route found.
  */
-function findBestRoute(graph, packages, plane, hub) {
-	console.log('Finding best route for plane:', plane.id);
+function findBestRoute(graph, packages, plane, hub, current_time) {
 	const selectedPackages = selectPackages(packages, plane.weightCapacity);
-	console.log('Selected packages for delivery:', selectedPackages);
-
 	if (selectedPackages.length === 0) return null;
 
-	// Get shortest paths using precomputed graph data
 	const destinations = selectedPackages.map((pkg) => pkg.destination);
-	const route = [hub, ...destinations, hub]; // Hub -> Destinations -> Hub
+	const route = [hub, ...destinations, hub];
 
 	let totalDistance = 0;
 	for (let i = 0; i < route.length - 1; i++) {
@@ -80,11 +58,20 @@ function findBestRoute(graph, packages, plane, hub) {
 		totalDistance += graph[from].connections.get(to).distance;
 	}
 
-	console.log('Computed route distance:', totalDistance);
+	const flightDuration = (totalDistance / plane.planeSpeed) * 60; // Convert hours to minutes
+	const flightEndTime = current_time + flightDuration;
+
+	// Ensure delivery is within the package's deadline
+	const allDeadlinesMet = selectedPackages.every(
+		(pkg) => flightEndTime <= pkg.arrivalTime + TIME_LIMIT,
+	);
+
+	if (!allDeadlinesMet) return null; // Skip if any package would be late
+
 	return {
 		route,
 		packages: selectedPackages.map((pkg) => pkg.id),
-		distance: totalDistance,
+		time: flightEndTime,
 	};
 }
 
