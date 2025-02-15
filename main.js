@@ -12,3 +12,5 @@ const graph = [
 ];
 
 const airport = buildAirportNetwork(graph);
+
+console.log(airport);

@@ -1,17 +1,18 @@
 {
-  "name": "airplanegraphproject",
-  "version": "1.0.0",
-  "description": "Programming Paradigms Project [Airplane Graph Project link](https://axyl-casc.github.io/AirplaneGraphProject/)",
-  "main": "main.js",
-  "scripts": {
-    "test": "jest",
-    "main": "node main.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "jest": "^29.7.0",
-    "prettier": "3.5.1"
-  }
+	"name": "airplanegraphproject",
+	"version": "1.0.0",
+	"description": "Programming Paradigms Project [Airplane Graph Project link](https://axyl-casc.github.io/AirplaneGraphProject/)",
+	"main": "main.js",
+	"scripts": {
+		"test": "jest",
+		"main": "node main.js",
+		"mainWithTest": "node main.js ./sample_input/files/sample_distance.json ./sample_input/files/sample_package.json ./sample_input/files/sample_constraints.json"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"jest": "^29.7.0",
+		"prettier": "3.5.1"
+	}
 }
