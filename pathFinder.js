@@ -22,6 +22,7 @@ function scheduleDeliveries(graph, packages, current_time, plane) {
 			current_time = Math.min(...packages.map((pkg) => pkg.arrivalTime));
 			continue;
 		}
+		console.log('kevin' + current_time);
 
 		const routePlan = findBestRoute(graph, availablePackages, plane, hub, current_time);
 		if (!routePlan) break;
@@ -59,7 +60,7 @@ function findBestRoute(graph, packages, plane, hub, current_time) {
 	}
 
 	const flightDuration = (totalDistance / plane.planeSpeed) * 60; // Convert hours to minutes
-	const flightEndTime = current_time + flightDuration;
+	const flightEndTime = flightDuration;
 
 	// Ensure delivery is within the package's deadline
 	const allDeadlinesMet = selectedPackages.every(
