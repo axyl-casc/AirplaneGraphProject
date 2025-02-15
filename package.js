@@ -22,3 +22,5 @@ function convertStringToInt(timeString) {
 	let timeStamp = hours * 60 + minutes;
 	return timeStamp;
 }
+
+module.exports = {TemooPackage}

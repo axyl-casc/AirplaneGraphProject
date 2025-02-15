@@ -37,3 +37,4 @@ class Airplane {
 let plane = new Airplane(5, 500);
 console.log(plane);
 plane.takePackage();
+module.exports = { Airplane };
