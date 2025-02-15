@@ -1,33 +1,41 @@
+const TIME_LIMIT = 24 * 60; // 24 hours in minutes
 
 /**
- * Schedules deliveries for planes using the precomputed airport graph.
+ * Schedules deliveries for a single plane using the precomputed airport graph.
  * @param {Airport[]} graph - The airport network with shortest paths.
- * @param {Object[]} packages - Array of package objects {id, weight, destination}.
- * @param {Object[]} planes - Array of plane objects {id, weight_capacity}.
- * @returns {Object[]} - Array of flight schedules for each plane.
+ * @param {Package[]} packages - Array of package objects.
+ * @param {number} current_time - The current time in minutes.
+ * @param {Airplane} plane - The single airplane object.
+ * @returns {Object} - Flight schedule for the plane.
  */
 function scheduleDeliveries(graph, packages, current_time, plane) {
-    // plane is for only one plane
-    // current_time so only packages with an arrival time lower than current_time are allowed
-    const hub = 0; // Assuming the hub is airport 0
-    const scheduledFlights = [];
+    const hub = 0; // Central hub airport ID
+    const planeSchedule = [];
 
-    for (const plane of planes) {
-        let remainingPackages = [...packages];
-        const planeSchedule = [];
+    while (packages.length > 0) {
+        // Calculate deadlineTime dynamically
+        let availablePackages = packages.filter(pkg => 
+            pkg.arrivalTime <= current_time && (pkg.arrivalTime + TIME_LIMIT) >= current_time
+        );
 
-        while (remainingPackages.length > 0) {
-            const routePlan = findBestRoute(graph, remainingPackages, plane, hub);
-            if (!routePlan) break; // No feasible route found
-
-            planeSchedule.push(routePlan);
-            remainingPackages = remainingPackages.filter(pkg => !routePlan.packages.includes(pkg.id));
+        if (availablePackages.length === 0) {
+            // If no packages are available, fast forward to the next package arrival
+            current_time = Math.min(...packages.map(pkg => pkg.arrivalTime));
+            continue;
         }
 
-        scheduledFlights.push({ plane: plane.id, flights: planeSchedule });
+        const routePlan = findBestRoute(graph, availablePackages, plane, hub, current_time);
+
+        if (!routePlan) break; // No valid route found
+
+        planeSchedule.push(routePlan);
+        current_time += routePlan.duration; // Advance time based on flight duration
+
+        // Remove delivered packages
+        packages = packages.filter(pkg => !routePlan.packages.includes(pkg.id));
     }
 
-    return scheduledFlights;
+    return { plane: plane.id, flights: planeSchedule };
 }
 
 /**
