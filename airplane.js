@@ -1,4 +1,4 @@
-const TemooPackage = require('./package.js');
+const { TemooPackage } = require('./package.js');
 
 class Airplane {
 	constructor(planeSpeed, weightCapacity) {
@@ -35,11 +35,5 @@ class Airplane {
 		return sum;
 	}
 }
-
-let plane = new Airplane(5, 500);
-console.log(plane);
-let testPackage = new TemooPackage({ id: 1, weight: 100, arrivalTime: '00:34', destination: 2 });
-plane.takePackage(testPackage);
-console.log(plane);
 
 module.exports = { Airplane };
