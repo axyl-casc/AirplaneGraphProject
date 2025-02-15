@@ -84,7 +84,7 @@ function findBestRoute(graph, packages, plane, hub) {
     return {
         route,
         packages: selectedPackages.map(pkg => pkg.id),
-        distance: totalDistance
+        totalTime: totalDistance / plane.planeSpeed
     };
 }
 
