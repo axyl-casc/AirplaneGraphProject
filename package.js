@@ -12,6 +12,10 @@ class TemooPackage {
 	  const [hours, minutes] = timeStr.split(':').map(Number);
 	  return hours * 60 + minutes;
 	}
+
+	getTime(){
+		return this.parseTime(this.arrivalTime)
+	}
   }
 /*
  *  Input: Expected input format is a string of the form "hh:mm" where hh is hours and mm is minutes
