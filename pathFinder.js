@@ -6,7 +6,9 @@
  * @param {Object[]} planes - Array of plane objects {id, weight_capacity}.
  * @returns {Object[]} - Array of flight schedules for each plane.
  */
-function scheduleDeliveries(graph, packages, planes) {
+function scheduleDeliveries(graph, packages, current_time, plane) {
+    // plane is for only one plane
+    // current_time so only packages with an arrival time lower than current_time are allowed
     const hub = 0; // Assuming the hub is airport 0
     const scheduledFlights = [];
 
