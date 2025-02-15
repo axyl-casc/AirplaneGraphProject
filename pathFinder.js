@@ -1,6 +1,8 @@
-class pathFinder {
-    //how to do this...
-    
 
 
+// get possible route for packages dropoff
+getPossibleRoute(airplanes, airportnetwork){
+
+
+    // return the total time taken to travel
 }

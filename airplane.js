@@ -3,6 +3,7 @@ class Airplane {
         this.planeSpeed = planeSpeed;
         this.weightCapacity = weightCapacity;
         this.readyToDeliver = true;
+        this.currentLocation = 0 // NODE ID
     }
 
 
