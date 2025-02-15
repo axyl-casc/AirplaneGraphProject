@@ -1,4 +1,5 @@
 const TIME_LIMIT = 24 * 60; // 24 hours in minutes
+const TURNAROUND_TIME = 0; // minutes
 
 /**
  * Schedules deliveries for a single plane using the precomputed airport graph.
@@ -8,10 +9,11 @@ const TIME_LIMIT = 24 * 60; // 24 hours in minutes
  * @param {Airplane} plane - The single airplane object.
  * @returns {Object} - Flight schedule for the plane.
  */
-
 function scheduleDeliveries(graph, packages, current_time, plane) {
-	const hub = 0;
+	const hub = 0; // Central hub airport ID
 	const planeSchedule = [];
+
+	console.log('Starting delivery scheduling...');
 
 	while (packages.length > 0) {
 		let availablePackages = packages.filter(
@@ -43,6 +45,7 @@ function scheduleDeliveries(graph, packages, current_time, plane) {
  * @param {Object[]} packages - Packages to deliver.
  * @param {Object} plane - Plane object with weight_capacity.
  * @param {number} hub - The central hub airport ID.
+ * @param {number} current_time - The current time in minutes.
  * @returns {Object|null} - Best route with package details or null if no route found.
  */
 function findBestRoute(graph, packages, plane, hub, current_time) {
