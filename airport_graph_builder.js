@@ -20,7 +20,7 @@ function shortestDistanceMatrix(distanceMatrix) {
 	const pathData = distanceMatrix.map((row) => {
 		return row.map((dist) => {
 			return {
-				distance: dist === -1 ? Infinity : dist,
+				distance: dist === -1 ? Number.POSITIVE_INFINITY : dist,
 				via: -1,
 			};
 		});
@@ -64,12 +64,12 @@ function shortestDistanceMatrix(distanceMatrix) {
 function buildAirportNetwork(distanceMatrix) {
 	const numOfAirports = distanceMatrix.length;
 	const shortestPaths = shortestDistanceMatrix(distanceMatrix);
-	let airports = [];
+	const airports = [];
 
 	for (let i = 0; i < numOfAirports; i++) {
 		const connections = new Map();
 		for (let j = 0; j < numOfAirports; j++) {
-			let path = [i]; // start from the source node
+			const path = [i]; // start from the source node
 			let intermediateNode = shortestPaths[i][j].via;
 			// check if there is a direct connection or if the target node is the source node
 			if (i === j || intermediateNode === -1) {

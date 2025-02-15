@@ -46,19 +46,19 @@ describe('Testing shortestDistanceMatrix function', () => {
 		];
 		const expectedPathData = [
 			[
-				{ distance: Infinity, via: -1 },
-				{ distance: Infinity, via: -1 },
-				{ distance: Infinity, via: -1 },
+				{ distance: Number.POSITIVE_INFINITY, via: -1 },
+				{ distance: Number.POSITIVE_INFINITY, via: -1 },
+				{ distance: Number.POSITIVE_INFINITY, via: -1 },
 			],
 			[
-				{ distance: Infinity, via: -1 },
-				{ distance: Infinity, via: -1 },
-				{ distance: Infinity, via: -1 },
+				{ distance: Number.POSITIVE_INFINITY, via: -1 },
+				{ distance: Number.POSITIVE_INFINITY, via: -1 },
+				{ distance: Number.POSITIVE_INFINITY, via: -1 },
 			],
 			[
-				{ distance: Infinity, via: -1 },
-				{ distance: Infinity, via: -1 },
-				{ distance: Infinity, via: -1 },
+				{ distance: Number.POSITIVE_INFINITY, via: -1 },
+				{ distance: Number.POSITIVE_INFINITY, via: -1 },
+				{ distance: Number.POSITIVE_INFINITY, via: -1 },
 			],
 		];
 		expect(shortestDistanceMatrix(distanceMatrix)).toEqual(expectedPathData);
