@@ -6,7 +6,7 @@ class TemooPackage {
 		this.id = singlePackageData.id;
 		this.weight = singlePackageData.weight;
 		this.arrivalTime = convertStringToInt(singlePackageData.arrivalTime);
-		this.deadlineTime = this.arrivalTime + TIME_LIMIT;
+		this.deadlineTime = 60 * 24;
 		this.destination = singlePackageData.destination;
 	}
 }
@@ -23,4 +23,4 @@ function convertStringToInt(timeString) {
 	return timeStamp;
 }
 
-module.exports = {TemooPackage}
+module.exports = { TemooPackage };

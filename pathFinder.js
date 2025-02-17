@@ -1,113 +1,154 @@
 const TIME_LIMIT = 24 * 60; // 24 hours in minutes
+const ORIGIN = 0;
 
-/**
- * Schedules deliveries for a single plane using the precomputed airport graph.
- * @param {Airport[]} graph - The airport network with shortest paths.
- * @param {Package[]} packages - Array of package objects.
- * @param {number} current_time - The current time in minutes.
- * @param {Airplane} plane - The single airplane object.
- * @returns {Object} - Flight schedule for the plane.
- */
+class Route {
+	constructor(plane) {
+		this.plane = plane;
+		this.packages = [];
+		this.departureTimeOrigin = 0;
+		this.arrivalTimesAtDestinations = [];
+		this.returnTimeOrigin = 0;
+		this.totalWeight = 0;
+		this.lastDestination = null;
+	}
 
-function scheduleDeliveries(graph, packages, current_time, plane) {
-    const hub = 0; // Central hub airport ID
-    const planeSchedule = [];
+	addPackage(packageToAdd, airportNetwork) {
+		if (packageToAdd.weight + this.totalWeight > this.plane.weightCapacity) {
+			return false;
+		}
+		const newPackages = [...this.packages, packageToAdd];
 
-    console.log("Starting delivery scheduling...");
+		newPackages.sort((a, b) => a.arrivalTime - b.arrivalTime);
+		const earliestDepartureTime = Math.max(
+			this.plane.availableTime,
+			newPackages[newPackages.length - 1].arrivalTime,
+		);
 
-    while (packages.length > 0) {
-        console.log("Current time:", current_time);
-        console.log("Remaining packages:", packages.length);
+		const newArrivalTimesAtDestinations = [];
 
-        // Calculate deadlineTime dynamically
-        let availablePackages = packages.filter(pkg => 
-            pkg.arrivalTime <= current_time && (pkg.arrivalTime + TIME_LIMIT) >= current_time
-        );
+		let currentTime = earliestDepartureTime;
 
-        console.log("Available packages for this iteration:", availablePackages.length);
+		let currLocation = 0;
+		for (const pkg of newPackages) {
+			const travelTime = getTravelTime(
+				currLocation,
+				pkg.destination,
+				airportNetwork,
+				this.plane.speed,
+			);
+			if (currentTime > pkg.deadlineTime) {
+				return false;
+			}
+			currentTime += travelTime;
+			currLocation = pkg.destination;
+			newArrivalTimesAtDestinations.push(currentTime);
+		}
 
-        if (availablePackages.length === 0) {
-            // If no packages are available, fast forward to the next package arrival
-            current_time = Math.min(...packages.map(pkg => pkg.arrivalTime));
-            console.log("No available packages. Fast-forwarding time to:", current_time);
-            continue;
-        }
+		this.returnTimeOrigin =
+			currentTime + getTravelTime(currLocation, 0, airportNetwork, this.plane.speed);
+		this.plane.availableTime = this.returnTimeOrigin;
 
-        const routePlan = findBestRoute(graph, availablePackages, plane, hub, current_time);
+		this.packages = newPackages;
+		this.lastDestination = currLocation;
+		this.totalWeight += packageToAdd.weight;
+		this.departureTimeOrigin = earliestDepartureTime;
+		this.arrivalTimesAtDestinations = newArrivalTimesAtDestinations;
+		return true;
+	}
 
-        if (!routePlan) {
-            console.log("No valid route found. Ending scheduling.");
-            break;
-        }
+	static RouteCreationPossible(packageToInsert, plane, airportNetwork) {
+		// Weight Capacity Check
+		if (plane.weightCapacity < packageToInsert.weight) {
+			return false; // Over capacity
+		}
+		const earliestDepartureTime = Math.max(plane.availableTime, packageToInsert.arrivalTime);
+		const arrivalTime =
+			earliestDepartureTime +
+			getTravelTime(ORIGIN, packageToInsert.destination, airportNetwork, plane.speed);
 
-        console.log("Planned route:", routePlan);
-        planeSchedule.push(routePlan);
-        current_time += routePlan.distance; // Advance time based on flight duration
+		//process.exit(-1);
+		if (arrivalTime > packageToInsert.deadlineTime) {
+			return false;
+		}
 
-        // Remove delivered packages
-        packages = packages.filter(pkg => !routePlan.packages.includes(pkg.id));
-        console.log("Packages after delivery:", packages.length);
-    }
+		return true;
+	}
 
-    console.log("Final delivery schedule:", planeSchedule);
-    return { plane: plane.id, flights: planeSchedule };
+	clone() {
+		const clonedRoute = new Route(this.plane);
+
+		clonedRoute.packages = [...this.packages];
+		clonedRoute.arrivalTimesAtDestinations = [...this.arrivalTimesAtDestinations];
+
+		clonedRoute.departureTimeOrigin = this.departureTimeOrigin;
+		clonedRoute.returnTimeOrigin = this.returnTimeOrigin;
+		clonedRoute.totalWeight = this.totalWeight;
+		clonedRoute.lastDestination = this.lastDestination;
+
+		return clonedRoute;
+	}
 }
 
-/**
- * Finds the best route for a plane to deliver packages from the hub.
- * Uses the **precomputed shortest paths** from the airport graph.
- * @param {Airport[]} graph - The airport network.
- * @param {Object[]} packages - Packages to deliver.
- * @param {Object} plane - Plane object with weight_capacity.
- * @param {number} hub - The central hub airport ID.
- * @returns {Object|null} - Best route with package details or null if no route found.
- */
-function findBestRoute(graph, packages, plane, hub) {
-    console.log("Finding best route for plane:", plane.id);
-    const selectedPackages = selectPackages(packages, plane.weightCapacity);
-    console.log("Selected packages for delivery:", selectedPackages);
-
-    if (selectedPackages.length === 0) return null;
-
-    // Get shortest paths using precomputed graph data
-    const destinations = selectedPackages.map(pkg => pkg.destination);
-    const route = [hub, ...destinations, hub]; // Hub -> Destinations -> Hub
-
-    let totalDistance = 0;
-    for (let i = 0; i < route.length - 1; i++) {
-        const from = route[i];
-        const to = route[i + 1];
-        totalDistance += graph[from].connections.get(to).distance;
-    }
-
-    console.log("Computed route distance:", totalDistance);
-    return {
-        route,
-        packages: selectedPackages.map(pkg => pkg.id),
-        distance: totalDistance
-    };
+function getTravelTime(origin, destination, graph, speed) {
+	const val = graph[origin].connections.get(destination).distance / speed;
+	return val * 60;
 }
 
-/**
- * Selects packages based on plane weight capacity.
- * @param {Object[]} packages - Packages to deliver.
- * @param {number} capacity - Plane weight capacity.
- * @returns {Object[]} - Selected packages within capacity.
- */
-function selectPackages(packages, capacity) {
-    let totalWeight = 0;
-    const selected = [];
+function scheduleDeliveries(unprocessedPackages, planes, currentRoutes, airportNetwork) {
+	if (unprocessedPackages.length === 0) {
+		return currentRoutes; // Base case: All packages are scheduled
+	}
 
-    console.log("Selecting packages within weight capacity:", capacity);
-    for (const pkg of packages) {
-        if (totalWeight + pkg.weight <= capacity) {
-            selected.push(pkg);
-            totalWeight += pkg.weight;
-            console.log(`Package ${pkg.id} added. Total weight:`, totalWeight);
-        }
-    }
+	// Select the first unprocessed package
+	const currentPackage = unprocessedPackages[0];
 
-    return selected;
+	// Try to insert into an existing route
+	for (let routeIndex = 0; routeIndex < currentRoutes.length; routeIndex++) {
+		const route = currentRoutes[routeIndex];
+		const previousAvailableTime = route.plane.availableTime; // Save original available time for backtracking
+
+		const clonedRoute = route.clone(); // Clone to avoid modifying the original route
+		if (clonedRoute.addPackage(currentPackage, airportNetwork)) {
+			const newRoutes = [...currentRoutes];
+			newRoutes[routeIndex] = clonedRoute; // Replace modified route instead of appending
+
+			const remainingPackages = unprocessedPackages.slice(1);
+			const solution = scheduleDeliveries(remainingPackages, planes, newRoutes, airportNetwork);
+			if (solution) {
+				return solution;
+			}
+
+			//Restore plane's available time if solution fails
+			route.plane.availableTime = previousAvailableTime;
+		}
+	}
+
+	// Try to start a new route with this package
+	for (let planeIndex = 0; planeIndex < planes.length; planeIndex++) {
+		const plane = planes[planeIndex];
+
+		const previousAvailableTime = plane.availableTime; // Save plane's available time for backtracking
+		if (Route.RouteCreationPossible(currentPackage, plane, airportNetwork)) {
+			const newRoute = new Route(plane);
+
+			newRoute.addPackage(currentPackage, airportNetwork);
+
+			const remainingPackages = unprocessedPackages.slice(1);
+			const nextRoutes = [...currentRoutes, newRoute]; // Add new route
+			plane.availableTime = newRoute.returnTimeOrigin;
+
+			const solution = scheduleDeliveries(remainingPackages, planes, nextRoutes, airportNetwork);
+
+			if (solution) {
+				return solution;
+			}
+
+			// Backtrack: Restore plane's available time if solution fails
+			plane.availableTime = previousAvailableTime;
+		}
+	}
+
+	return null; // No valid schedule found, backtrack
 }
 
 module.exports = { scheduleDeliveries };
