@@ -1,0 +1,6 @@
+[
+	{ "id": 1, "weight": 500, "arrivalTime": "20:59", "destination": 5 },
+	{ "id": 2, "weight": 500, "arrivalTime": "21:00", "destination": 5 },
+	{ "id": 3, "weight": 500, "arrivalTime": "21:00", "destination": 5 },
+	{ "id": 4, "weight": 500, "arrivalTime": "22:59", "destination": 5 }
+]

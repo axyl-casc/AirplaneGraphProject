@@ -1,22 +1,22 @@
-const TIME_LIMIT = 1440; //in minutes, the time limit for delivery from arrival to destintation.
+const TIME_LIMIT = 1440; //in minutes, the time limit for delivery from arrival to destination.
 
 class TemooPackage {
 	constructor({ id, weight, arrivalTime, destination }) {
-	  this.id = id;
-	  this.weight = weight;
-	  this.arrivalTime = this.parseTime(arrivalTime);
-	  this.destination = destination;
-	}
-  
-	parseTime(timeStr) {
-	  const [hours, minutes] = timeStr.split(':').map(Number);
-	  return hours * 60 + minutes;
+		this.id = id;
+		this.weight = weight;
+		this.arrivalTime = this.parseTime(arrivalTime);
+		this.destination = destination;
 	}
 
-	getTime(){
-		return this.parseTime(this.arrivalTime)
+	parseTime(timeStr) {
+		const [hours, minutes] = timeStr.split(':').map(Number);
+		return hours * 60 + minutes;
 	}
-  }
+
+	getTime() {
+		return this.parseTime(this.arrivalTime);
+	}
+}
 /*
  *  Input: Expected input format is a string of the form "hh:mm" where hh is hours and mm is minutes
  *
@@ -30,4 +30,4 @@ function convertStringToInt(timeString) {
 	return timeStamp;
 }
 
-module.exports = {TemooPackage}
+module.exports = { TemooPackage };
