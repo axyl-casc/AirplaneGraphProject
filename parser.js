@@ -173,7 +173,6 @@ function verifyPackageStructure(packageData) {
 			printErrorAndExit(BASE_ERROR_MSG + 'Input is not an array.');
 		}
 
-		const numOfRows = packageData.length;
 		if (packageData.length === 0) {
 			printErrorAndExit(BASE_ERROR_MSG + 'packageData is empty');
 		}
@@ -183,7 +182,7 @@ function verifyPackageStructure(packageData) {
 				printErrorAndExit(BASE_ERROR_MSG + 'Each package must be a valid JSON object.');
 			}
 
-			const expectedKeys = ['id', 'weight', 'arrivalTime', 'destination'];
+			const expectedKeys = ['id', 'weight', 'arrivalTime', 'destination', 'deadlineTime'];
 			if (Object.keys(row).length !== expectedKeys.length) {
 				printErrorAndExit(
 					BASE_ERROR_MSG +
@@ -218,6 +217,9 @@ function verifyPackageStructure(packageData) {
 			}
 
 			if (typeof row.arrivalTime != 'string') {
+				printErrorAndExit(BASE_ERROR_MSG + 'arrivalTime must be a string');
+			}
+			if (typeof row.deadlineTime != 'string') {
 				printErrorAndExit(BASE_ERROR_MSG + 'arrivalTime must be a string');
 			}
 		}
@@ -272,15 +274,3 @@ module.exports = {
 	printErrorAndExit,
 	parseAndLoadInputFiles,
 };
-
-function parseDistanceMatrix(matrixData) {
-	let airports = [[]];
-}
-
-function parsePackageData(packageData) {
-	//stuff
-}
-
-function parseShippingConstraints(shipppingConstraints) {
-	//stuff
-}

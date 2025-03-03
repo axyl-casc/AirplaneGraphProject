@@ -1,26 +1,42 @@
-const TIME_LIMIT = 1440; //in minutes, the time limit for delivery from arrival to destintation.
-
 class TemooPackage {
-	//{ "id": 1, "weight": 100, "arrivalTime": "00:34", "destination": 2 } is sample object for constructor
+	//{ "id": 1, "weight": 100, "arrivalTime": "00:34", deadlineTime: "12:24", "destination": 2 } is sample object for constructor
 	constructor(singlePackageData) {
 		this.id = singlePackageData.id;
 		this.weight = singlePackageData.weight;
-		this.arrivalTime = convertStringToInt(singlePackageData.arrivalTime);
-		this.deadlineTime = 60 * 24;
+		this.arrivalTime = this.convertStringToInt(singlePackageData.arrivalTime);
+		this.deadlineTime = this.convertStringToInt(singlePackageData.deadlineTime);
 		this.destination = singlePackageData.destination;
 	}
-}
-/*
- *  Input: Expected input format is a string of the form "hh:mm" where hh is hours and mm is minutes
- *
- *  Output: An integer value, a timestamp in minutes.
- */
-function convertStringToInt(timeString) {
-	let stringParts = timeString.split(':');
-	let hours = Number(stringParts[0]);
-	let minutes = Number(stringParts[1]);
-	let timeStamp = hours * 60 + minutes;
-	return timeStamp;
+
+	deepCopy() {
+		return new TemooPackage({
+			id: this.id,
+			weight: this.weight,
+			arrivalTime: this.convertIntToString(this.arrivalTime),
+			deadlineTime: this.convertIntToString(this.deadlineTime),
+			destination: this.destination,
+		});
+	}
+
+	/*
+	 * Converts time in minutes to a "hh:mm" string
+	 */
+	convertIntToString(timeInMinutes) {
+		const hours = Math.floor(timeInMinutes / 60);
+		const minutes = timeInMinutes % 60;
+		return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+	}
+
+	/*
+	 * Converts "hh:mm" string to minutes in integer format
+	 */
+	convertStringToInt(timeString) {
+		let stringParts = timeString.split(':');
+		let hours = Number(stringParts[0]);
+		let minutes = Number(stringParts[1]);
+		let timeStamp = hours * 60 + minutes;
+		return timeStamp;
+	}
 }
 
 module.exports = { TemooPackage };

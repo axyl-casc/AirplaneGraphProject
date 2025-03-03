@@ -1,16 +1,21 @@
 // For testing graphs:https://graphonline.top
 
 const { parseAndLoadInputFiles } = require('./parser.js');
-const { buildAirportNetwork, Airport } = require('./airport_graph_builder.js');
+const { buildAirportNetwork } = require('./airport_graph_builder.js');
+const { TemooPackage } = require('./package.js');
+const { Airplane } = require('./airplane.js');
 
-//const [distanceMatrix, packageData, constraints] = parseAndLoadInputFiles();
-const graph = [
-	[0, 2, -1, 5],
-	[2, 0, 3, -1],
-	[-1, 3, 0, 2],
-	[5, -1, 2, 0],
-];
+const [distanceMatrix, packageData, constraints] = parseAndLoadInputFiles();
 
-const airport = buildAirportNetwork(graph);
+const packages = packageData.map((pkg) => new TemooPackage(pkg));
 
-console.log(airport);
+const planes = [];
+for (let i = 0; i < constraints.numOfPlanes; i++) {
+	planes.push(new Airplane(constraints.speed, constraints.weightCapacity, i));
+}
+
+console.log(planes);
+
+const airportNetwork = buildAirportNetwork(distanceMatrix);
+
+console.log(airportNetwork);

@@ -1,7 +1,7 @@
-const { buildAirportNetwork, Airport } = require('../airport_graph_builder');
-const { scheduleDeliveries } = require('../pathFinder.js');
-const { Airplane } = require('../airplane');
-const { TemooPackage } = require('../package'); // ✅ Corrected class name
+const { buildAirportNetwork, Airport } = require('../../airport_graph_builder.js');
+const { scheduleDeliveries } = require('../../pathFinder.js');
+const { Airplane } = require('../../airplane.js');
+const { TemooPackage } = require('../../package.js'); // ✅ Corrected class name
 
 const TIME_LIMIT = 24 * 60; // 24 hours in minutes
 
