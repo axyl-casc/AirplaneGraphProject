@@ -1,5 +1,4 @@
 const ORIGIN = 0;
-//const { Airplane } = require('./airplane');
 const { TemooPackage } = require('./package');
 class Route {
 	constructor(planeSpeed, weightCapacity) {
@@ -12,6 +11,16 @@ class Route {
 		this.planeSpeed = planeSpeed;
 	}
 
+	/**
+	 * Checks if inserting a package at a specific position is feasible in regards to time constraints
+	 *
+	 * @param {Object} packageToInsert - The package to be inserted
+	 * @param {Number} insertPosition - Position in the route where the package would be inserted
+	 * @param {Number} earliestDepartureTime - The earliest possible departure time from origin
+	 * @param {Object} airportNetwork - Network with travel distances between locations
+	 * @returns {Boolean} - True if insertion is feasible time-wise, false otherwise
+	 *
+	 */
 	isTimeFeasible(packageToInsert, insertPosition, earliestDepartureTime, airportNetwork) {
 		let currentTime = earliestDepartureTime;
 		let currentLocation = ORIGIN;
@@ -66,7 +75,15 @@ class Route {
 		}
 		return true;
 	}
-
+	/**
+	 * Checks if total distance if a package is inserted into a specific position in the route
+	 *
+	 * @param {Object} packageToInsert - The package to be inserted
+	 * @param {Number} insertPosition - Position in the route where the package would be inserted
+	 * @param {Object} airportNetwork - Network with travel distances between locations
+	 * @returns {Number} - Total distance of the route with the inserted package
+	 *
+	 */
 	calculateDistanceWithInsertion(packageToInsert, insertPosition, airportNetwork) {
 		let totalDistance = 0;
 		let currentLocation = ORIGIN;
@@ -96,6 +113,13 @@ class Route {
 		return totalDistance;
 	}
 
+	/**
+	 * Attempts to add a package to the route at the optimal position
+	 *
+	 * @param {Object} packageToInsert - The package to be inserted into the route
+	 * @param {Object} airportNetwork - Network with travel distances between locations
+	 * @returns {Number} - The insertion position if successful, -1 if insertion is not feasible
+	 */
 	tryAddPackage(packageToInsert, airportNetwork) {
 		let bestDistance = Infinity;
 		let bestInsertPosition = -1;
@@ -168,12 +192,11 @@ class Route {
 /**
  * Gets the travel time in minutes from origin to destination using the graph provided.
  *
- * @param {Number} origin - The index of the from
- * @param {Array} destination - Available airplanes
- * @param {Number} currentSolutionTotal - Current solution cost
- * @param {Object} bestSolutionInfo - Object containing bestTotal and bestSolution
- * @param {Object} airportNetwork - Network with travel distances
- * @returns {Object} - Updated bestSolutionInfo
+ * @param {Number} origin - The origin node index
+ * @param {Number} destination - The destination node index
+ * @param {Object} graph - The airport network graph with connections
+ * @param {Number} speed - The speed of the aircraft in km/h
+ * @returns {Number} - Travel time in minutes
  */
 function getTravelTime(origin, destination, graph, speed) {
 	const val = graph[origin].connections.get(destination).distance / speed;
@@ -196,7 +219,7 @@ function scheduleDeliveries(
 	bestSolutionInfo,
 	airportNetwork,
 ) {
-	// creating the object if it is accidentally not provided
+	// Creating the object if it is accidentally not provided
 	if (!bestSolutionInfo) {
 		bestSolutionInfo = {
 			bestTotal: Infinity,
@@ -213,8 +236,6 @@ function scheduleDeliveries(
 	// Base case - all packages assigned
 	if (unassignedPackages.length === 0) {
 		bestSolutionInfo.totalNumberOfSolutions++;
-		//console.log(JSON.stringify(bestSolutionInfo, null, 2));
-
 		if (currentSolutionTotal < bestSolutionInfo.bestTotal) {
 			bestSolutionInfo.bestTotal = currentSolutionTotal;
 			bestSolutionInfo.bestSolution = deepCopyArray(airplanes);
@@ -228,7 +249,7 @@ function scheduleDeliveries(
 	// New array with the selected package removed
 	const remainingPackages = unassignedPackages.filter((pkg) => pkg.id !== nextPackage.id);
 
-	// Try creating a new route for each plane
+	// Try add the package to each route in each plane
 	for (let i = 0; i < airplanes.length; i++) {
 		// Create a deep copy for backtracking
 		const planesCopy = deepCopyArray(airplanes);
@@ -236,6 +257,7 @@ function scheduleDeliveries(
 
 		// Store the previous route distance
 		const prevRouteDistance = targetPlane.route.totalDistance;
+
 		// Try adding package to this route
 		const insertionResult = targetPlane.route.tryAddPackage(nextPackage, airportNetwork);
 

@@ -158,8 +158,8 @@ describe('pathFinder Unit Tests', () => {
 	describe('Airplane.deepCopy', () => {
 		test('should create a deep copy of an Airplane object', () => {
 			const airplane = new Airplane(50, 400);
-			//const copiedAirplane = airplane.deepCopy();
-			//expect(copiedAirplane).toEqual(airplane);
+			const copiedAirplane = airplane.deepCopy();
+			expect(copiedAirplane).toEqual(airplane);
 		});
 	});
 
