@@ -1,0 +1,8 @@
+[
+	{ "id": 1, "weight": 120, "arrivalTime": "09:00", "deadlineTime": "10:30", "destination": 1 },
+	{ "id": 2, "weight": 140, "arrivalTime": "09:30", "deadlineTime": "11:15", "destination": 2 },
+	{ "id": 3, "weight": 160, "arrivalTime": "10:00", "deadlineTime": "12:00", "destination": 3 },
+	{ "id": 4, "weight": 130, "arrivalTime": "10:30", "deadlineTime": "12:45", "destination": 4 },
+	{ "id": 5, "weight": 150, "arrivalTime": "11:00", "deadlineTime": "13:30", "destination": 2 },
+	{ "id": 6, "weight": 170, "arrivalTime": "11:30", "deadlineTime": "14:15", "destination": 1 }
+]

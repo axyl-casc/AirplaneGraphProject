@@ -1,8 +1,8 @@
 const ORIGIN = 0;
-const { Airplane } = require('./airplane');
+//const { Airplane } = require('./airplane');
 const { TemooPackage } = require('./package');
 class Route {
-	constructor(planeSpeed, weightCapacity, planeAvailableTime) {
+	constructor(planeSpeed, weightCapacity) {
 		this.packages = [];
 		this.departureTimeOrigin = 0;
 		this.returnTimeOrigin = 0;
@@ -10,7 +10,6 @@ class Route {
 		this.totalDistance = 0;
 		this.totalCapacity = weightCapacity;
 		this.planeSpeed = planeSpeed;
-		this.planeAvailableTime = planeAvailableTime;
 	}
 
 	isTimeFeasible(packageToInsert, insertPosition, earliestDepartureTime, airportNetwork) {
@@ -104,11 +103,7 @@ class Route {
 			return -1;
 		}
 
-		const earliestDepartureTime = Math.max(
-			packageToInsert.arrivalTime,
-			this.departureTimeOrigin,
-			this.planeAvailableTime,
-		);
+		const earliestDepartureTime = Math.max(packageToInsert.arrivalTime, this.departureTimeOrigin);
 
 		// Special case for empty routes
 		if (this.packages.length === 0) {
@@ -156,28 +151,8 @@ class Route {
 		return bestInsertPosition;
 	}
 
-	//Assumes that the plane is empty
-	static RouteCreationFeasible(packageToInsert, plane, airportNetwork) {
-		// Weight Capacity Check
-		if (plane.weightCapacity < packageToInsert.weight) {
-			return false;
-		}
-
-		const earliestDepartureTime = Math.max(plane.availableTime, packageToInsert.arrivalTime);
-		const destination = packageToInsert.destination;
-		const packageDestinationArrivalTime =
-			earliestDepartureTime + getTravelTime(ORIGIN, destination, airportNetwork, plane.speed);
-
-		// Package expired
-		if (packageDestinationArrivalTime > packageToInsert.deadlineTime) {
-			return false;
-		}
-
-		return true;
-	}
-
 	deepCopy() {
-		const newRoute = new Route(this.planeSpeed, this.totalCapacity, this.planeAvailableTime);
+		const newRoute = new Route(this.planeSpeed, this.totalCapacity);
 
 		newRoute.packages = this.packages.map((pkg) => pkg.deepCopy());
 
@@ -189,6 +164,7 @@ class Route {
 		return newRoute;
 	}
 }
+
 /**
  * Gets the travel time in minutes from origin to destination using the graph provided.
  *
@@ -225,6 +201,7 @@ function scheduleDeliveries(
 		bestSolutionInfo = {
 			bestTotal: Infinity,
 			bestSolution: null,
+			totalNumberOfSolutions: 0,
 		};
 	}
 
@@ -235,6 +212,9 @@ function scheduleDeliveries(
 
 	// Base case - all packages assigned
 	if (unassignedPackages.length === 0) {
+		bestSolutionInfo.totalNumberOfSolutions++;
+		//console.log(JSON.stringify(bestSolutionInfo, null, 2));
+
 		if (currentSolutionTotal < bestSolutionInfo.bestTotal) {
 			bestSolutionInfo.bestTotal = currentSolutionTotal;
 			bestSolutionInfo.bestSolution = deepCopyArray(airplanes);
@@ -245,73 +225,32 @@ function scheduleDeliveries(
 	// Select next package by earliest deadline
 	const nextPackage = selectNextPackage(unassignedPackages);
 
-	// Create deep copies so that backtracking can work properly
-	const airplanesCopy = deepCopyArray(airplanes);
-
 	// New array with the selected package removed
 	const remainingPackages = unassignedPackages.filter((pkg) => pkg.id !== nextPackage.id);
 
 	// Try creating a new route for each plane
-	for (let i = 0; i < airplanesCopy.length; i++) {
-		const plane = airplanesCopy[i];
+	for (let i = 0; i < airplanes.length; i++) {
+		// Create a deep copy for backtracking
+		const planesCopy = deepCopyArray(airplanes);
+		const targetPlane = planesCopy[i];
 
-		// Try creating a new route for this plane
-		if (Route.RouteCreationFeasible(nextPackage, plane, airportNetwork)) {
-			// Create a deep copy of current state
-			const planesCopyForNewRoute = deepCopyArray(airplanesCopy);
-			const targetPlane = planesCopyForNewRoute[i];
+		// Store the previous route distance
+		const prevRouteDistance = targetPlane.route.totalDistance;
+		// Try adding package to this route
+		const insertionResult = targetPlane.route.tryAddPackage(nextPackage, airportNetwork);
 
-			// Create new route and add package to it
-			const newRoute = new Route(
-				targetPlane.speed,
-				targetPlane.weightCapacity,
-				targetPlane.availableTime,
-			);
-			newRoute.tryAddPackage(nextPackage, airportNetwork);
+		if (insertionResult !== -1) {
+			// Calculate new solution total
+			const newTotal = currentSolutionTotal - prevRouteDistance + targetPlane.route.totalDistance;
 
-			// Add route to plane
-			targetPlane.routes.push(newRoute);
-
-			// Calculate new total solution total
-			const newSolutionTotal = currentSolutionTotal + newRoute.totalDistance;
-
-			targetPlane.availableTime = newRoute.returnTimeOrigin;
 			// Recursive call with updated state
 			bestSolutionInfo = scheduleDeliveries(
 				remainingPackages,
-				planesCopyForNewRoute,
-				newSolutionTotal,
+				planesCopy,
+				newTotal,
 				bestSolutionInfo,
 				airportNetwork,
 			);
-		}
-
-		// Try adding to existing routes on this plane
-		for (let j = 0; j < plane.routes.length; j++) {
-			// Create a deep copy of current state
-			const planesCopyForExistingRoute = deepCopyArray(airplanesCopy);
-			const targetPlane = planesCopyForExistingRoute[i];
-			const targetRoute = targetPlane.routes[j];
-
-			// Store the previous route distance
-			const prevRouteDistance = targetRoute.totalDistance;
-
-			// Try adding package to this route
-			const insertionResult = targetRoute.tryAddPackage(nextPackage, airportNetwork);
-
-			if (insertionResult !== -1) {
-				// Calculate new solution total
-				const newTotal = currentSolutionTotal - prevRouteDistance + targetRoute.totalDistance;
-				planesCopyForExistingRoute[i].availableTime = targetRoute.returnTimeOrigin;
-				// Recursive call with updated state
-				bestSolutionInfo = scheduleDeliveries(
-					remainingPackages,
-					planesCopyForExistingRoute,
-					newTotal,
-					bestSolutionInfo,
-					airportNetwork,
-				);
-			}
 		}
 	}
 

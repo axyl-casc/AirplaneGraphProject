@@ -1,19 +1,16 @@
 const { Route } = require('./pathFinder.js');
 
 class Airplane {
-	constructor(planeSpeed, weightCapacity, planeNumber) {
+	constructor(planeSpeed, weightCapacity) {
 		this.speed = planeSpeed;
 		this.weightCapacity = weightCapacity;
-		this.availableTime = 0;
-		this.planeNumber = planeNumber;
-		this.routes = [];
+		this.route = new Route(this.speed, this.weightCapacity);
 	}
 
 	deepCopy() {
-		const newPlane = new Airplane(this.speed, this.weightCapacity, this.planeNumber);
+		const newPlane = new Airplane(this.speed, this.weightCapacity);
 
-		newPlane.availableTime = this.availableTime;
-		newPlane.routes = this.routes.map((route) => route.deepCopy());
+		newPlane.route = this.route.deepCopy();
 
 		return newPlane;
 	}

@@ -1,7 +1,7 @@
 [
-	{ "id": 1, "weight": 100, "arrivalTime": "00:34", "deadlineTime": "24:00", "destination": 2 },
-	{ "id": 2, "weight": 150, "arrivalTime": "12:34", "deadlineTime": "24:00", "destination": 3 },
-	{ "id": 3, "weight": 80, "arrivalTime": "23:55", "deadlineTime": "24:00", "destination": 1 },
-	{ "id": 4, "weight": 200, "arrivalTime": "22:45", "deadlineTime": "24:00", "destination": 4 },
-	{ "id": 5, "weight": 50, "arrivalTime": "09:34", "deadlineTime": "24:00", "destination": 5 }
+	{ "id": 1, "weight": 100, "arrivalTime": "08:00", "deadlineTime": "10:00", "destination": 1 },
+	{ "id": 2, "weight": 150, "arrivalTime": "08:30", "deadlineTime": "12:00", "destination": 2 },
+	{ "id": 3, "weight": 120, "arrivalTime": "09:15", "deadlineTime": "11:30", "destination": 3 },
+	{ "id": 4, "weight": 180, "arrivalTime": "10:00", "deadlineTime": "14:00", "destination": 4 },
+	{ "id": 5, "weight": 90, "arrivalTime": "10:30", "deadlineTime": "13:00", "destination": 2 }
 ]

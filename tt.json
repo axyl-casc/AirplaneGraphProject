@@ -1,0 +1,48 @@
+{
+  "bestTotal": 400,
+  "bestSolution": [
+    {
+      "speed": 60,
+      "weightCapacity": 300,
+      "route": {
+        "packages": [
+          {
+            "id": 1,
+            "weight": 150,
+            "arrivalTime": 480,
+            "deadlineTime": 720,
+            "destination": 1
+          }
+        ],
+        "departureTimeOrigin": 480,
+        "returnTimeOrigin": 680,
+        "totalWeight": 150,
+        "totalDistance": 200,
+        "totalCapacity": 300,
+        "planeSpeed": 60
+      }
+    },
+    {
+      "speed": 60,
+      "weightCapacity": 300,
+      "route": {
+        "packages": [
+          {
+            "id": 2,
+            "weight": 200,
+            "arrivalTime": 540,
+            "deadlineTime": 780,
+            "destination": 1
+          }
+        ],
+        "departureTimeOrigin": 540,
+        "returnTimeOrigin": 740,
+        "totalWeight": 200,
+        "totalDistance": 200,
+        "totalCapacity": 300,
+        "planeSpeed": 60
+      }
+    }
+  ],
+  "totalNumberOfSolutions": 1
+}
