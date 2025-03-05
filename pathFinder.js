@@ -1,208 +1,5 @@
-const ORIGIN = 0;
 const { TemooPackage } = require('./package');
-class Route {
-	constructor(planeSpeed, weightCapacity) {
-		this.packages = [];
-		this.departureTimeOrigin = 0;
-		this.returnTimeOrigin = 0;
-		this.totalWeight = 0;
-		this.totalDistance = 0;
-		this.totalCapacity = weightCapacity;
-		this.planeSpeed = planeSpeed;
-	}
-
-	/**
-	 * Checks if inserting a package at a specific position is feasible in regards to time constraints
-	 *
-	 * @param {Object} packageToInsert - The package to be inserted
-	 * @param {Number} insertPosition - Position in the route where the package would be inserted
-	 * @param {Number} earliestDepartureTime - The earliest possible departure time from origin
-	 * @param {Object} airportNetwork - Network with travel distances between locations
-	 * @returns {Boolean} - True if insertion is feasible time-wise, false otherwise
-	 *
-	 */
-	isTimeFeasible(packageToInsert, insertPosition, earliestDepartureTime, airportNetwork) {
-		let currentTime = earliestDepartureTime;
-		let currentLocation = ORIGIN;
-
-		for (let i = 0; i < insertPosition; i++) {
-			const pkg = this.packages[i];
-			const travelTime = getTravelTime(
-				currentLocation,
-				pkg.destination,
-				airportNetwork,
-				this.planeSpeed,
-			);
-			currentTime += travelTime;
-
-			if (currentTime > pkg.deadlineTime) {
-				return false;
-			}
-
-			currentLocation = pkg.destination;
-		}
-
-		// Check inserted package
-		const travelTimeToNew = getTravelTime(
-			currentLocation,
-			packageToInsert.destination,
-			airportNetwork,
-			this.planeSpeed,
-		);
-		currentTime += travelTimeToNew;
-
-		if (currentTime > packageToInsert.deadlineTime) {
-			return false;
-		}
-
-		currentLocation = packageToInsert.destination;
-
-		for (let i = insertPosition; i < this.packages.length; i++) {
-			const pkg = this.packages[i];
-			const travelTime = getTravelTime(
-				currentLocation,
-				pkg.destination,
-				airportNetwork,
-				this.planeSpeed,
-			);
-			currentTime += travelTime;
-
-			if (currentTime > pkg.deadlineTime) {
-				return false;
-			}
-
-			currentLocation = pkg.destination;
-		}
-		return true;
-	}
-	/**
-	 * Checks if total distance if a package is inserted into a specific position in the route
-	 *
-	 * @param {Object} packageToInsert - The package to be inserted
-	 * @param {Number} insertPosition - Position in the route where the package would be inserted
-	 * @param {Object} airportNetwork - Network with travel distances between locations
-	 * @returns {Number} - Total distance of the route with the inserted package
-	 *
-	 */
-	calculateDistanceWithInsertion(packageToInsert, insertPosition, airportNetwork) {
-		let totalDistance = 0;
-		let currentLocation = ORIGIN;
-
-		// Distance up to insertion
-		for (let i = 0; i < insertPosition; i++) {
-			const pkg = this.packages[i];
-			totalDistance += airportNetwork[currentLocation].connections.get(pkg.destination).distance;
-			currentLocation = pkg.destination;
-		}
-		// Add new package
-		totalDistance += airportNetwork[currentLocation].connections.get(
-			packageToInsert.destination,
-		).distance;
-		currentLocation = packageToInsert.destination;
-
-		// Remaining packages
-		for (let i = insertPosition; i < this.packages.length; i++) {
-			const pkg = this.packages[i];
-			totalDistance += airportNetwork[currentLocation].connections.get(pkg.destination).distance;
-			currentLocation = pkg.destination;
-		}
-
-		// Return to origin
-		totalDistance += airportNetwork[currentLocation].connections.get(ORIGIN).distance;
-
-		return totalDistance;
-	}
-
-	/**
-	 * Attempts to add a package to the route at the optimal position
-	 *
-	 * @param {Object} packageToInsert - The package to be inserted into the route
-	 * @param {Object} airportNetwork - Network with travel distances between locations
-	 * @returns {Number} - The insertion position if successful, -1 if insertion is not feasible
-	 */
-	tryAddPackage(packageToInsert, airportNetwork) {
-		let bestDistance = Infinity;
-		let bestInsertPosition = -1;
-		if (this.totalWeight + packageToInsert.weight > this.totalCapacity) {
-			return -1;
-		}
-
-		const earliestDepartureTime = Math.max(packageToInsert.arrivalTime, this.departureTimeOrigin);
-
-		// Special case for empty routes
-		if (this.packages.length === 0) {
-			// Check if package can be delivered on time
-			let travelTime = getTravelTime(
-				ORIGIN,
-				packageToInsert.destination,
-				airportNetwork,
-				this.planeSpeed,
-			);
-			let arrivalTime = earliestDepartureTime + travelTime;
-
-			if (arrivalTime > packageToInsert.deadlineTime) {
-				return -1;
-			}
-			bestDistance =
-				airportNetwork[ORIGIN].connections.get(packageToInsert.destination).distance * 2;
-
-			bestInsertPosition = 0;
-		} else {
-			for (let i = 0; i <= this.packages.length; i++) {
-				let newDistance = this.calculateDistanceWithInsertion(packageToInsert, i, airportNetwork);
-				if (
-					newDistance < bestDistance &&
-					this.isTimeFeasible(packageToInsert, i, earliestDepartureTime, airportNetwork)
-				) {
-					bestDistance = newDistance;
-					bestInsertPosition = i;
-				}
-			}
-		}
-
-		// If we found a feasible position, update route
-		if (bestInsertPosition !== -1) {
-			this.totalDistance = bestDistance;
-			this.packages.splice(bestInsertPosition, 0, packageToInsert);
-
-			this.totalWeight += packageToInsert.weight;
-
-			this.departureTimeOrigin = earliestDepartureTime;
-
-			this.returnTimeOrigin = (bestDistance / this.planeSpeed) * 60 + this.departureTimeOrigin;
-		}
-
-		return bestInsertPosition;
-	}
-
-	deepCopy() {
-		const newRoute = new Route(this.planeSpeed, this.totalCapacity);
-
-		newRoute.packages = this.packages.map((pkg) => pkg.deepCopy());
-
-		newRoute.departureTimeOrigin = this.departureTimeOrigin;
-		newRoute.returnTimeOrigin = this.returnTimeOrigin;
-		newRoute.totalWeight = this.totalWeight;
-		newRoute.totalDistance = this.totalDistance;
-
-		return newRoute;
-	}
-}
-
-/**
- * Gets the travel time in minutes from origin to destination using the graph provided.
- *
- * @param {Number} origin - The origin node index
- * @param {Number} destination - The destination node index
- * @param {Object} graph - The airport network graph with connections
- * @param {Number} speed - The speed of the aircraft in km/h
- * @returns {Number} - Travel time in minutes
- */
-function getTravelTime(origin, destination, graph, speed) {
-	const val = graph[origin].connections.get(destination).distance / speed;
-	return val * 60;
-}
-
+const { Airplane } = require('./airplane');
 /**
  * Main scheduling function that uses branch and cut to find the optimal package assignment
  * @param {Array} unassignedPackages - Packages that need to be assigned
@@ -212,13 +9,7 @@ function getTravelTime(origin, destination, graph, speed) {
  * @param {Object} airportNetwork - Network with travel distances
  * @returns {Object} - Updated bestSolutionInfo
  */
-function scheduleDeliveries(
-	unassignedPackages,
-	airplanes,
-	currentSolutionTotal,
-	bestSolutionInfo,
-	airportNetwork,
-) {
+function scheduleDeliveries(unassignedPackages, airplanes, currentSolutionTotal, bestSolutionInfo) {
 	// Creating the object if it is accidentally not provided
 	if (!bestSolutionInfo) {
 		bestSolutionInfo = {
@@ -256,22 +47,20 @@ function scheduleDeliveries(
 		const targetPlane = planesCopy[i];
 
 		// Store the previous route distance
-		const prevRouteDistance = targetPlane.route.totalDistance;
+		const prevRouteDistance = targetPlane.totalDistance;
 
 		// Try adding package to this route
-		const insertionResult = targetPlane.route.tryAddPackage(nextPackage, airportNetwork);
+		const insertionResult = targetPlane.tryAddPackage(nextPackage);
 
 		if (insertionResult !== -1) {
 			// Calculate new solution total
-			const newTotal = currentSolutionTotal - prevRouteDistance + targetPlane.route.totalDistance;
-
+			const newTotal = currentSolutionTotal - prevRouteDistance + targetPlane.totalDistance;
 			// Recursive call with updated state
 			bestSolutionInfo = scheduleDeliveries(
 				remainingPackages,
 				planesCopy,
 				newTotal,
 				bestSolutionInfo,
-				airportNetwork,
 			);
 		}
 	}
@@ -300,4 +89,4 @@ function deepCopyArray(objects) {
 	return objects.map((elem) => elem.deepCopy());
 }
 
-module.exports = { scheduleDeliveries, Route, getTravelTime, deepCopyArray, selectNextPackage };
+module.exports = { scheduleDeliveries, deepCopyArray, selectNextPackage };

@@ -3,6 +3,24 @@ class Airport {
 		this.airportID = airportID;
 		this.connections = connections;
 	}
+
+	/**
+	 * Formats and returns the path to a destination airport as a  string
+	 *
+	 * @param {number} destinationAirportID - The ID of the destination airport
+	 * @returns {string} A formatted string representation of the path (e.g. "0 -> 2 -> 3")
+	 */
+	formatPathToAirport(destinationAirportID) {
+		let pathString = `${this.airportID}`;
+
+		const pathNodes = this.connections.get(destinationAirportID).path;
+
+		pathNodes.forEach((id) => {
+			pathString += ` -> ${id}`;
+		});
+
+		return pathString;
+	}
 }
 
 /**

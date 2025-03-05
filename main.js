@@ -4,34 +4,124 @@ const { parseAndLoadInputFiles } = require('./parser.js');
 const { buildAirportNetwork } = require('./airport_graph_builder.js');
 const { TemooPackage } = require('./package.js');
 const { Airplane } = require('./airplane.js');
-const { Route, scheduleDeliveries } = require('./pathFinder.js');
+const { scheduleDeliveries } = require('./pathFinder.js');
 
+//Load the input Files
 const [distanceMatrix, packageData, constraints] = parseAndLoadInputFiles();
 
+// Create the package objects
 const packages = packageData.map((pkg) => new TemooPackage(pkg));
 
+// Create the planes objects
 const planes = [];
 for (let i = 0; i < constraints.numOfPlanes; i++) {
 	planes.push(new Airplane(constraints.speed, constraints.weightCapacity));
 }
 
+// build and initialize the airport network to be used for finding the path from one airport to another
 const airportNetwork = buildAirportNetwork(distanceMatrix);
-var bestSolutionInfo = {
+Airplane.setAirportNetwork(airportNetwork);
+let bestSolutionInfo = {
 	bestTotal: Infinity,
 	bestSolution: null,
 	totalNumberOfSolutions: 0,
 };
-const deliveryPlan = scheduleDeliveries(packages, planes, 0, bestSolutionInfo, airportNetwork);
 
+// Find the solution
+const deliveryPlan = scheduleDeliveries(packages, planes, 0, bestSolutionInfo);
 printSolution(deliveryPlan, airportNetwork);
+
+/**
+ * Prints a detailed report of the optimal delivery solution.
+ *
+ * @param {object} bestSolutionInfo - An object containing the best solution and related statistics.
+ * @param {object} airportNetwork - An object representing the airport network with connections.
+ */
+function printSolution(solution, airportNetwork) {
+	// If a solution was not found
+	if (!bestSolutionInfo.bestSolution) {
+		console.log('No feasible delivery solution found.');
+		return;
+	}
+
+	const deliveryPlan = bestSolutionInfo.bestSolution;
+	const reportLines = [];
+
+	// --- Header and Overall Statistics ---
+	reportLines.push('=== DELIVERY SOLUTION REPORT ===');
+	reportLines.push(`Total Distance: ${bestSolutionInfo.bestTotal} km`);
+	reportLines.push(`Total Solutions Evaluated: ${bestSolutionInfo.totalNumberOfSolutions}`);
+	reportLines.push(`Number of Airplanes Used: ${deliveryPlan.length}`);
+	reportLines.push(`Airplane Capacity: ${deliveryPlan[0].totalWeightCapacity} kg`);
+	reportLines.push(`Airplane Speed: ${deliveryPlan[0].speed} km/h`);
+	reportLines.push('');
+
+	// --- Count Total Packages Delivered ---
+	const totalDeliveredPackages = deliveryPlan.reduce(
+		(sum, airplane) => sum + airplane.packages.length,
+		0,
+	);
+
+	reportLines.push(`Total Packages Delivered: ${totalDeliveredPackages}`);
+	reportLines.push('');
+
+	// --- Each Airplane-Specific Details ---
+	deliveryPlan.forEach((airplane, index) => {
+		reportLines.push(`--- AIRPLANE ${index + 1} ---`);
+		reportLines.push(
+			`Load: ${airplane.currentLoad} kg (${((airplane.currentLoad / airplane.totalWeightCapacity) * 100).toFixed(1)}%)`,
+		);
+		reportLines.push(`Total Distance Traveled: ${airplane.totalDistance} km`);
+		reportLines.push(`Departure Time: ${formatTime(airplane.departureTimeOrigin)} (HH:MM)`);
+		reportLines.push(`Return Time: ${formatTime(airplane.returnTimeOrigin)} (HH:MM)`);
+		reportLines.push('');
+
+		reportLines.push('DETAILED ROUTE:');
+
+		// Route Details
+		let currentAirport = 0; // Origin
+		let currentTime = airplane.departureTimeOrigin;
+
+		airplane.packages.forEach((packageInfo, packageIndex) => {
+			const connection = airportNetwork[currentAirport].connections.get(packageInfo.destination);
+			const legDistance = connection.distance;
+			const legTravelTimeMinutes = (legDistance / airplane.speed) * 60;
+			currentTime += legTravelTimeMinutes;
+
+			const legDescription = `  Leg ${packageIndex + 1}: ${airportNetwork[currentAirport].formatPathToAirport(packageInfo.destination)}`;
+			legDescription += `\n    Distance: ${legDistance} km`;
+			legDescription += `\n    Travel Time: ${formatTime(legTravelTimeMinutes)} (HH:MM)`;
+			legDescription += `\n    Arrival Time: ${formatTime(currentTime)} (HH:MM)`;
+			legDescription += `\n    Delivering: Package ${packageInfo.id} (${packageInfo.weight} kg)`;
+			legDescription += `\n    Deadline: ${formatTime(packageInfo.deadlineTime)} (HH:MM)`;
+			reportLines.push(legDescription);
+
+			currentAirport = packageInfo.destination;
+		});
+
+		// --- Return to Origin ---
+		const returnDistance = airportNetwork[currentAirport].connections.get(0).distance;
+		const returnTravelTimeMinutes = (returnDistance / airplane.speed) * 60;
+		currentTime += returnTravelTimeMinutes;
+
+		const returnLegDescription = `  Return to Origin: ${airportNetwork[currentAirport].formatPathToAirport(0)}`;
+		returnLegDescription += `\n    Distance: ${returnDistance} km`;
+		returnLegDescription += `\n    Travel Time: ${formatTime(returnTravelTimeMinutes)} (HH:MM)`;
+		returnLegDescription += `\n    Arrival Time: ${formatTime(currentTime)} (HH:MM)`;
+		reportLines.push(returnLegDescription);
+	});
+
+	// --- Output the Report ---
+	console.log(reportLines.join('\n'));
+}
 
 /**
  * Formats and prints the solution in a readable format
  * @param {Object} bestSolutionInfo - Object containing the best solution found
- * @param {Object} airportNetwork - Network with travel distances between locations
+ * @param {Object} airportNetwork - Graph network of airports
  *  */
 function printSolution(bestSolutionInfo, airportNetwork) {
-	if (!bestSolutionInfo || !bestSolutionInfo.bestSolution) {
+	if (!bestSolutionInfo.bestSolution) {
 		return 'No solution found.';
 	}
 
@@ -40,30 +130,32 @@ function printSolution(bestSolutionInfo, airportNetwork) {
 
 	// Print header and overall statistics
 	output.push('=== DELIVERY SOLUTION ===');
-	output.push(`Total Distance: ${bestSolutionInfo.bestTotal.toFixed(2)} km`);
+	output.push(`Total Distance: ${bestSolutionInfo.bestTotal} km`);
 	output.push(`Total Solutions Evaluated: ${bestSolutionInfo.totalNumberOfSolutions}`);
+
 	output.push(`Number of Airplanes Used: ${solution.length}`);
+	output.push(`Each Airplane's Weight Capacity: ${solution[0].totalWeightCapacity}`);
+	output.push(`Each Airplane's speed: ${solution[0].speed}`);
+
 	output.push('');
 
-	// Count total packages
+	// Total Packages Delivered
 	let totalPackages = 0;
 	solution.forEach((airplane) => {
-		totalPackages += airplane.route.packages.length;
+		totalPackages += airplane.packages.length;
 	});
 	output.push(`Total Packages Delivered: ${totalPackages}`);
 	output.push('');
 
-	// Print details for each airplane
+	// Details for each airplane
 	solution.forEach((airplane, index) => {
 		output.push(`--- AIRPLANE ${index} ---`);
-		output.push(`Speed: ${airplane.route.planeSpeed} km/h`);
-		output.push(`Capacity: ${airplane.route.totalCapacity} kg`);
 		output.push(
-			`Load: ${airplane.route.totalWeight} kg (${((airplane.route.totalWeight / airplane.route.totalCapacity) * 100).toFixed(1)}%)`,
+			`Load: ${airplane.currentLoad} kg (${((airplane.totalWeightCapacity / airplane.totalWeightCapacity) * 100).toFixed(1)}%)`,
 		);
-		output.push(`Distance: ${airplane.route.totalDistance}`);
-		output.push(`Departure Time: ${formatTime(airplane.route.departureTimeOrigin)} (HH:MM)`);
-		output.push(`Return Time: ${formatTime(airplane.route.returnTimeOrigin)} (HH:MM)`);
+		output.push(`Total Distance Traveled: ${airplane.totalDistance}`);
+		output.push(`Departure Time From Origin: ${formatTime(airplane.departureTimeOrigin)} (HH:MM)`);
+		output.push(`Return Time To Origin: ${formatTime(airplane.returnTimeOrigin)} (HH:MM)`);
 
 		// Print detailed route with distances
 		output.push('');
@@ -71,67 +163,34 @@ function printSolution(bestSolutionInfo, airportNetwork) {
 
 		// Initialize current location and time
 		let currentLocation = 0; // Origin
-		let currentTime = airplane.route.departureTimeOrigin;
+		let currentTime = airplane.departureTimeOrigin;
 
-		// Construct path array including origin, all destinations, and return to origin from the packages delivered
-		const path = [0]; // Start at origin
-		airplane.route.packages.forEach((pkg) => {
-			path.push(pkg.destination);
-		});
-		path.push(0); // Return to origin
-
-		// Display each leg of the journey
-		for (let i = 0; i < path.length - 1; i++) {
-			const from = path[i];
-			const to = path[i + 1];
-
-			// Get connection info
-			const connection = airportNetwork[from].connections.get(to);
+		airplane.packages.forEach((pkg, index) => {
+			const connection = airportNetwork[currentLocation].connections.get(pkg.destination);
 			const distance = connection.distance;
-			const travelTime = (distance / airplane.route.planeSpeed) * 60; // minutes
-			const path2 = connection.path;
-
-			// Update current time
+			const travelTime = (distance / airplane.speed) * 60; //  in minutes
 			currentTime += travelTime;
 
-			// Create leg description
-			let legDescription = `  Leg ${i + 1}: Location ${from} → Location ${to}`;
-			legDescription += `\n`;
-			path2.forEach((p) => {
-				legDescription += `→ ${p} `;
-			});
+			let legDescription = `  Leg ${index + 1}: ${airportNetwork[currentLocation].formatPathToAirport(pkg.destination)}`;
 
 			legDescription += `\n    Distance: ${distance} km`;
 			legDescription += `\n    Travel Time: ${formatTime(travelTime)} (hh:mm)`;
 			legDescription += `\n    Arrival Time: ${formatTime(currentTime)} (hh:mm)`;
-
-			// Add package information if this is a delivery (not return to origin)
-			if (i < airplane.route.packages.length) {
-				const pkg = airplane.route.packages[i];
-				legDescription += `\n    Delivering: Package ${pkg.id} (${pkg.weight} kg)`;
-				legDescription += `\n    Deadline: ${formatTime(pkg.deadlineTime)}`;
-
-				// Calculate time margin
-				const timeMargin = pkg.deadlineTime - currentTime;
-				const marginStatus =
-					timeMargin >= 0
-						? `On time (${formatTime(timeMargin)} before deadline)`
-						: `LATE by ${formatTime(-timeMargin)}`;
-				legDescription += `\n    Status: ${marginStatus}`;
-			} else {
-				legDescription += '\n    Returning to Origin';
-			}
-
+			legDescription += `\n    Delivering: Package ${pkg.id} (${pkg.weight} kg)`;
+			legDescription += `\n    Deadline: ${formatTime(pkg.deadlineTime)}`;
 			output.push(legDescription);
-		}
 
-		output.push('');
-		const graphPath = [];
-		for (let i = 0; i < path.length - 1; i++) {
-			graphPath.push(`${path[i]}->${path[i + 1]}`);
-		}
-		output.push(`  ${graphPath.join(', ')}`);
-		output.push('');
+			currentLocation = pkg.destination;
+		});
+
+		const returnToORiginDist = airportNetwork[currentLocation].connections.get(0).distance;
+		const travelTime = (returnToORiginDist / airplane.speed) * 60;
+		let returnToORiginLeg = `  Return to Origin Leg : ${airportNetwork[currentLocation].formatPathToAirport(0)}`;
+		currentTime += travelTime;
+		returnToORiginLeg += `\n    Distance: ${returnToORiginDist} km`;
+		returnToORiginLeg += `\n    Travel Time: ${formatTime(travelTime)} (hh:mm)`;
+		returnToORiginLeg += `\n    Arrival Time: ${formatTime(currentTime)} (hh:mm)`;
+		output.push(returnToORiginLeg);
 	});
 
 	console.log(output.join('\n'));
