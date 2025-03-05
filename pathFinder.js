@@ -9,29 +9,22 @@ const { Airplane } = require('./airplane');
  * @param {Object} airportNetwork - Network with travel distances
  * @returns {Object} - Updated bestSolutionInfo
  */
-function scheduleDeliveries(unassignedPackages, airplanes, currentSolutionTotal, bestSolutionInfo) {
-	// Creating the object if it is accidentally not provided
-	if (!bestSolutionInfo) {
-		bestSolutionInfo = {
-			bestTotal: Infinity,
-			bestSolution: null,
-			totalNumberOfSolutions: 0,
-		};
-	}
+function scheduleDeliveries(unassignedPackages, airplanes, currentSolutionTotal, optimalSolution) {
+	optimalSolution.totalNodesExplored++;
 
 	// Prune if this branch can't be better than the current best solution
-	if (currentSolutionTotal >= bestSolutionInfo.bestTotal) {
-		return bestSolutionInfo;
+	if (currentSolutionTotal >= optimalSolution.optimalMinDistance) {
+		return optimalSolution;
 	}
 
 	// Base case - all packages assigned
 	if (unassignedPackages.length === 0) {
-		bestSolutionInfo.totalNumberOfSolutions++;
-		if (currentSolutionTotal < bestSolutionInfo.bestTotal) {
-			bestSolutionInfo.bestTotal = currentSolutionTotal;
-			bestSolutionInfo.bestSolution = deepCopyArray(airplanes);
+		optimalSolution.validSolutionsCount++;
+		if (currentSolutionTotal < optimalSolution.optimalMinDistance) {
+			optimalSolution.optimalMinDistance = currentSolutionTotal;
+			optimalSolution.optimalPlaneConfig = deepCopyArray(airplanes);
 		}
-		return bestSolutionInfo;
+		return optimalSolution;
 	}
 
 	// Select next package by earliest deadline
@@ -56,16 +49,16 @@ function scheduleDeliveries(unassignedPackages, airplanes, currentSolutionTotal,
 			// Calculate new solution total
 			const newTotal = currentSolutionTotal - prevRouteDistance + targetPlane.totalDistance;
 			// Recursive call with updated state
-			bestSolutionInfo = scheduleDeliveries(
+			optimalSolution = scheduleDeliveries(
 				remainingPackages,
 				planesCopy,
 				newTotal,
-				bestSolutionInfo,
+				optimalSolution,
 			);
 		}
 	}
 
-	return bestSolutionInfo;
+	return optimalSolution;
 }
 
 /**
