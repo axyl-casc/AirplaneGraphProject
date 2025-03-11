@@ -1,4 +1,4 @@
 # AirplaneGraphProject
-Programming Paradigms Project
+Programming Paradigms Project Haskell Version
 
 
