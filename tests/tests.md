@@ -275,3 +275,66 @@ node main.js tests/integration_tests/11/11_dist.json tests/integration_tests/11/
 **Expected outcome:** No solution.
 
 ## Test Cases Where Input Files Are Not in the Correct Format
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+### Test Case 12: (Format Test)
+
+**Purpose:** Constraint data is not in the correct format.
+
+```json
+{ 
+    "numOfPlanes": 2, 
+    "weightCapacity": 500, 
+    "speed": 700,
+    "bouncy": true 
+}
+```
+
+```bash
+node main.js tests/integration_tests/12/12_dist.json tests/integration_tests/12/12_pkg.json tests/integration_tests/12/12_constraints.json
+```
+
+**Expected outcome:** Error.
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+### Test Case 13: (Format Test)
+
+**Purpose:** Package data is not in the correct format.
+
+```json
+[
+	{ "id": 1, "weight": 250, "arrivalTime": "08:00", "deadlineTime": "10:00", "destination": 1, "extra": "fakedata" }
+]
+```
+
+```bash
+node main.js tests/integration_tests/13/13_dist.json tests/integration_tests/13/13_pkg.json tests/integration_tests/13/13_constraints.json
+```
+
+**Expected outcome:** Error.
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+### Test Case 14: (Format Test)
+
+**Purpose:** If incorrect amount of parameters are passed.
+
+```bash
+node main.js fakefile.json fakefile2.json
+```
+
+**Expected outcome:** Error.
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+### Test Case 15: (Format Test)
+
+**Purpose:** If file cannot be found.
+
+```bash
+node main.js fakefile.json fakefile2.json fakefile3.json
+```
+
+**Expected outcome:** Error: File not found.
