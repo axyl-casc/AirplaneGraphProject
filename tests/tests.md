@@ -43,6 +43,8 @@ node main.js tests/integration_tests/[test_case_number]/[test_case_number]_dist.
 
 ## Test Cases Which Should Generate Solutions
 
+-------------------------------------------------------------------------------------------------------------------------------------
+
 ### Test Case 1: Single Package, Single Airplane
 
 **Purpose:** Verifies basic functionality with minimal complexity.
@@ -74,6 +76,8 @@ node main.js tests/integration_tests/1/1_dist.json tests/integration_tests/1/1_p
 ```
 
 **Expected outcome:** The singular plane delivers the only package with the total distance of 200.
+
+-------------------------------------------------------------------------------------------------------------------------------------
 
 ### Test Case 2: Two Packages, Single Airplane (Same Destination)
 
@@ -108,6 +112,104 @@ node main.js tests/integration_tests/2/2_dist.json tests/integration_tests/2/2_p
 
 **Expected outcome:** The singular plane takes both packages and the total distance should be 200.
 
+-------------------------------------------------------------------------------------------------------------------------------------
+
+### Test Case 3: 2 Packages, 2 Airplanes, Same Destination (Weight Capacity Test)
+
+**Purpose:** Tests handling multiple packages that requires 2 airplanes going to the same location (due to weight capacity).
+
+```bash
+node main.js tests/integration_tests/3/3_dist.json tests/integration_tests/3/3_pkg.json tests/integration_tests/3/3_constraints.json
+```
+
+**Expected outcome:** 2 Planes should both be flown to the same destination each carrying a package.
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+### Test Case 4: 2 Packages, 2 Airplanes, 2 Destinations (Weight Capacity Test)
+
+**Purpose:** Tests handling multiple packages that requires 2 airplanes going to different locations (due to weight capacity).
+
+```bash
+node main.js tests/integration_tests/4/4_dist.json tests/integration_tests/4/4_pkg.json tests/integration_tests/4/4_constraints.json
+```
+
+**Expected outcome:** 2 Planes should both be flown to the corresponding destination each carrying a package.
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+### Test Case 5: 2 Packages, 2 Airplanes, 2 Destinations (Deadline Test)
+
+**Purpose:** Tests handling multiple packages that requires 2 airplanes going to different locations (due to an expiring deadline).
+
+```bash
+node main.js tests/integration_tests/5/5_dist.json tests/integration_tests/5/5_pkg.json tests/integration_tests/5/5_constraints.json
+```
+
+**Expected outcome:** 2 Planes should both be flown to the corresponding destination each carrying a package.
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+### Test Case 6: 2 Packages, 2 Airplanes, 2 Destinations (Deadline Test)
+
+**Purpose:** Tests handling multiple packages that requires only 1 airplanes going to different locations (deadlines don't expire)
+
+```bash
+node main.js tests/integration_tests/6/6_dist.json tests/integration_tests/6/6_pkg.json tests/integration_tests/6/6_constraints.json
+```
+
+**Expected outcome:** 1 Plane should be flown to the corresponding destination dropping off 2 packages.
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+### Test Case 7: 2 Packages, 2 Airplanes, Multiple Destinations (Cost Test)
+
+**Purpose:** Seeing if we are able to find the minimum cost route
+
+```bash
+node main.js tests/integration_tests/7/7_dist.json tests/integration_tests/7/7_pkg.json tests/integration_tests/7/7_constraints.json
+```
+
+```json
+//the graph
+[
+	[  0, 500,  600,   -1],
+	[500,   0,   -1,  500],
+  [600,  -1,    0, 2000],
+	[ -1, 500, 2000,    0]
+]
+```
+
+**Expected outcome:** Cost/distance should be 3200(km) total
+
+**Notes:** Through experimentation trying to find a situation where 1 plane would be more expensive than taking 2, with the 
+current way that we are calculating costs (where we are including the return to origin airport), cost will NEVER be a deciding
+factor for taking additional aircrafts. It will always be done either because we failed to reach a deadline successfully or 
+because we have reached the weight capacity for an aircraft.
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+### Test Case 8: 2 Packages, 2 Airplanes, Multiple Destinations (Cost Test)
+
+**Purpose:** The first solution found with 1 plane is more expensive than if we were to add a plane (find optimal solution).
+
+```bash
+node main.js tests/integration_tests/8/8_dist.json tests/integration_tests/8/8_pkg.json tests/integration_tests/8/8_constraints.json
+```
+
+```json
+//the graph
+[
+	[  0, 500,  600,   -1],
+	[500,   0,   -1,  500],
+  [600,  -1,    0, 2000],
+	[ -1, 500, 2000,    0]
+]
+```
+
+**Expected outcome:** Plane 0 should be sent to Airport 1 & 3, Plane 1 should be sent to Airport 2
+
+-------------------------------------------------------------------------------------------------------------------------------------
 ## Test Cases Which Should Not Generate Solutions
 
 ## Test Cases Where Input Files Are Not in the Correct Format
