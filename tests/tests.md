@@ -189,27 +189,89 @@ because we have reached the weight capacity for an aircraft.
 
 -------------------------------------------------------------------------------------------------------------------------------------
 
-### Test Case 8: 2 Packages, 2 Airplanes, Multiple Destinations (Cost Test)
+### Test Case 8: 4 Packages, 3 Airplanes, Multiple Destinations (Deadline Test)
 
-**Purpose:** The first solution found with 1 plane is more expensive than if we were to add a plane (find optimal solution).
+**Purpose:** We have multiple planes and multiple packages, despite the fact that the weight of each package could easily fit
+onto a single aircraft due to the deadlines we should see specific planes carry specific packages.
 
 ```bash
 node main.js tests/integration_tests/8/8_dist.json tests/integration_tests/8/8_pkg.json tests/integration_tests/8/8_constraints.json
 ```
 
 ```json
-//the graph
+//the graph used
 [
 	[  0, 500,  600,   -1],
-	[500,   0,   -1,  500],
+	[500,   0,   -1,   -1],
   [600,  -1,    0, 2000],
-	[ -1, 500, 2000,    0]
+	[ -1,  -1, 2000,    0]
+]
+
+//package data used
+[
+	  { "id": 1, "weight": 50, "arrivalTime": "20:00", "deadlineTime": "24:00", "destination": 4 },
+    { "id": 2, "weight": 50, "arrivalTime": "22:00", "deadlineTime": "24:00", "destination": 1 },
+    { "id": 3, "weight": 50, "arrivalTime": "23:00", "deadlineTime": "24:00", "destination": 1 },
+    { "id": 4, "weight": 50, "arrivalTime": "23:00", "deadlineTime": "24:00", "destination": 2 }
+
 ]
 ```
 
-**Expected outcome:** Plane 0 should be sent to Airport 1 & 3, Plane 1 should be sent to Airport 2
+**Expected outcome:** Plane 0 should be sent to Airport 3 with package 1,
+                      Plane 1 should be sent to Airport 1 with package 2,3,
+                      Plane 2 should be sent to Airport 2 with package 4.
 
 -------------------------------------------------------------------------------------------------------------------------------------
 ## Test Cases Which Should Not Generate Solutions
+-------------------------------------------------------------------------------------------------------------------------------------
+
+### Test Case 9: 4 Packages, 3 Airplanes, Multiple Destinations (Deadline Test)
+
+**Purpose:** Exact same scenario as Test Case 8, with tight deadlines but one fewer plane which makes it impossible
+
+```bash
+node main.js tests/integration_tests/9/9_dist.json tests/integration_tests/9/9_pkg.json tests/integration_tests/9/9_constraints.json
+```
+
+**Expected outcome:** No solution.
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+### Test Case 10: 1 Package, 1 Plane (Weight Test)
+
+**Purpose:** A package that is too large to fit on a plane cannot be delivered
+
+```bash
+node main.js tests/integration_tests/10/10_dist.json tests/integration_tests/10/10_pkg.json tests/integration_tests/10/10_constraints.json
+```
+
+```json
+//constraints
+{ 
+    "numOfPlanes": 1, 
+    "weightCapacity": 500, 
+    "speed": 700 
+}
+
+//package data
+[
+	{ "id": 1, "weight": 600, "arrivalTime": "08:00", "deadlineTime": "24:00", "destination": 1 }
+]
+
+```
+
+**Expected outcome:** No solution.
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+### Test Case 11: 1 Package, 1 Plane (Deadline Test)
+
+**Purpose:** A package that arrives too late for it's destination cannot ever be delivered.
+
+```bash
+node main.js tests/integration_tests/11/11_dist.json tests/integration_tests/11/11_pkg.json tests/integration_tests/11/11_constraints.json
+```
+
+**Expected outcome:** No solution.
 
 ## Test Cases Where Input Files Are Not in the Correct Format
