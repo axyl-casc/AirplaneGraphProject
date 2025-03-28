@@ -338,3 +338,33 @@ node main.js fakefile.json fakefile2.json fakefile3.json
 ```
 
 **Expected outcome:** Error: File not found.
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+## Test Cases For Limit Testing Performance (Time Taken to Run Program)
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+### Test Case 16: (Performance Test)
+
+**Purpose:** Find the number of input data that causes issues with our solution.
+
+```bash
+node main.js tests/integration_tests/16/16_dist.json tests/integration_tests/16/16_pkg.json tests/integration_tests/16/16_constraints.json
+```
+
+**Expected outcome:** Error: File not found.
+
+{ "id": 10, "weight": 50, "arrivalTime": "00:00", "deadlineTime": "24:00", "destination": 4 },
+    { "id": 11, "weight": 50, "arrivalTime": "00:00", "deadlineTime": "24:00", "destination": 5 },
+    { "id": 12, "weight": 50, "arrivalTime": "00:00", "deadlineTime": "24:00", "destination": 7 },
+    { "id": 13, "weight": 50, "arrivalTime": "00:00", "deadlineTime": "24:00", "destination": 8 },
+    { "id": 14, "weight": 50, "arrivalTime": "00:00", "deadlineTime": "24:00", "destination": 4 },
+    { "id": 15, "weight": 50, "arrivalTime": "00:00", "deadlineTime": "24:00", "destination": 2 },
+    { "id": 16, "weight": 50, "arrivalTime": "00:00", "deadlineTime": "24:00", "destination": 1 },
+    { "id": 17, "weight": 50, "arrivalTime": "00:00", "deadlineTime": "24:00", "destination": 16 },
+    { "id": 18, "weight": 50, "arrivalTime": "00:00", "deadlineTime": "24:00", "destination": 16 },
+    { "id": 19, "weight": 50, "arrivalTime": "00:00", "deadlineTime": "24:00", "destination": 11 },
+    { "id": 20, "weight": 50, "arrivalTime": "00:00", "deadlineTime": "24:00", "destination": 10 },
+    { "id": 21, "weight": 50, "arrivalTime": "00:00", "deadlineTime": "24:00", "destination": 7 },
+    { "id": 22, "weight": 50, "arrivalTime": "00:00", "deadlineTime": "24:00", "destination": 14 }

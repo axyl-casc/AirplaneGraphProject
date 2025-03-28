@@ -46,7 +46,7 @@ function printSolution(optimalDeliverySchedule, airportNetwork, numOfPackages) {
 	const report = [];
 
 	report.push('=== DELIVERY SOLUTION ===');
-	report.push(`Number of  Valid Solutions: ${optimalDeliverySchedule.validSolutionsCount}`);
+	report.push(`Number of  Optimal Solutions: ${optimalDeliverySchedule.validSolutionsCount}`);
 	report.push(`Number of Nodes Explored: ${optimalDeliverySchedule.totalNodesExplored}`);
 
 	// If a solution was not found
