@@ -179,7 +179,7 @@ parseInputFiles = do
             pkgData <- parsePackageData packageFile
             constrData <- parseConstraints constrFile
             let airportGraph = buildAirportGraph distData
-            let airplanes = createMultipleAirplanes (speed constrData) (weightCapacity constrData) (numOfPlanes constrData)
+            let airplanes = createMultipleAirplanes (weightCapacity constrData) (speed constrData) (numOfPlanes constrData)
             return (airportGraph, pkgData, airplanes)
 
 -- | Check if a string is in the expected time format HH:MM.

@@ -11,9 +11,9 @@ main :: IO ()
 main = 
     do 
     (distanceMatrix, pkgData, airplanes) <- parseInputFiles
-  
-    
+    let firstPlane = head airplanes
+    let newPlane = tryAddPackage firstPlane (head pkgData)
 
 
 
-    print pkgData                     
+    print newPlane                     

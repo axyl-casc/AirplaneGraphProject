@@ -14,10 +14,12 @@ module AirplaneType
   getPackages,
   getDistanceTraveled,
   getReturnTimeToOrigin,
-  getDepartureTimeFromOrigin
+  getDepartureTimeFromOrigin,
+  tryAddPackage
 ) where
 
-import PackageType(PackageData)
+import PackageType
+import PackageType (getWeightOfPackage)
 
 -- | Represents an airplane used for package delivery.
 -- Contains information about the airplane's capacity, load, and current status.
@@ -118,6 +120,13 @@ getReturnTimeToOrigin = returnTimeToOrigin
 getDepartureTimeFromOrigin :: Airplane -> Int
 getDepartureTimeFromOrigin = departureTimeFromOrigin
 
+tryAddPackage :: Airplane -> PackageData -> Maybe Airplane
+tryAddPackage plane pkgToAdd
+  | getCurrentLoad plane + getWeightOfPackage pkgToAdd > getTotalCapacity plane = Nothing
+  | otherwise = Just $ plane { 
+      packages = packages plane ++ [pkgToAdd],
+      currentLoad = getCurrentLoad plane + getWeightOfPackage pkgToAdd
+    }
 
 -- Add other getter or manipulator functions as required by your application...
 -- For example, a function to add a package might look like:
