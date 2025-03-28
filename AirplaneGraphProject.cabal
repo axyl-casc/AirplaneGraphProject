@@ -74,6 +74,7 @@ executable AirplaneGraphProject
                       time,
                       split,
                       containers,
+                      regex-tdfa
 
     other-modules:    JsonParser,
                       AirportGraph,

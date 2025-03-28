@@ -60,6 +60,16 @@
   (major1) == 1 && (major2) <  2 || \
   (major1) == 1 && (major2) == 2 && (minor) <= 3)
 #endif /* MIN_VERSION_lens_aeson */
+/* package regex-tdfa-1.3.2.3 */
+#ifndef VERSION_regex_tdfa
+#define VERSION_regex_tdfa "1.3.2.3"
+#endif /* VERSION_regex_tdfa */
+#ifndef MIN_VERSION_regex_tdfa
+#define MIN_VERSION_regex_tdfa(major1,major2,minor) (\
+  (major1) <  1 || \
+  (major1) == 1 && (major2) <  3 || \
+  (major1) == 1 && (major2) == 3 && (minor) <= 2)
+#endif /* MIN_VERSION_regex_tdfa */
 /* package split-0.2.5 */
 #ifndef VERSION_split
 #define VERSION_split "0.2.5"
