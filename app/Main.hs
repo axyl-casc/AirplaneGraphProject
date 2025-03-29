@@ -2,7 +2,7 @@ module Main where
 import JsonParser 
 import PackageType
 import AirplaneType
-import AirportGraph (buildAirportGraph)
+import AirportGraph (buildAirportGraph, getDistanceTo)
 import Solver
 
 
@@ -27,4 +27,4 @@ main =
     putStrLn $ "Valid Solutions Found: " ++ show (validCount finalSolution)
     putStrLn $ "Optimal Distance: " ++ show (bestDistance finalSolution)
     putStrLn $ "Airplane Assignments:"
-    mapM_ print (bestPlanes finalSolution)                 
+    mapM_ print (bestPlanes finalSolution) 

@@ -2,37 +2,38 @@
 -- Provides functionality for building airport network,
 -- and retrieving distances and paths between airports.
 module AirportGraph
-(
-  -- * Data Types
-  Airport,
-  -- * Graph Construction
-  buildAirportGraph,
-  -- * Graph Operations
-  getDistanceTo,
-  getPathTo
-)
+  ( -- * Data Types
+    Airport,
+
+    -- * Graph Construction
+    buildAirportGraph,
+
+    -- * Graph Operations
+    getDistanceTo,
+    getPathTo,
+  )
 where
 
-import qualified Data.Map as Map
 import Data.Map (Map)
-
+import qualified Data.Map as Map
 
 -- | Represents an airport node in the transportation network.
--- 
-data Airport = AirportInternal {
-  airportID :: Int,                -- ^ Unique identifier for the airport
-  connections :: Map Int PathInfo  -- ^ Map of connections to other airports
-} deriving (Show)
-
+data Airport = AirportInternal
+  { -- | Unique identifier for the airport
+    airportID :: Int,
+    -- | Map of connections to other airports
+    connections :: Map Int PathInfo
+  }
+  deriving (Show)
 
 -- | Contains information about paths between airports.
--- 
-data PathInfo = PathInfo {
-  path :: [Int],    -- ^ Sequence of airport IDs forming the path
-  distance :: Int   -- ^ Total distance of the path
-} deriving (Show)
-
-
+data PathInfo = PathInfo
+  { -- | Sequence of airport IDs forming the path
+    path :: [Int],
+    -- | Total distance of the path
+    distance :: Int
+  }
+  deriving (Show)
 
 -- | Implements the Floyd-Warshall algorithm to compute shortest paths.
 -- Takes a distance matrix and returns a matrix of distances and intermediate nodes.
@@ -41,22 +42,25 @@ data PathInfo = PathInfo {
 --
 -- @Returns a matrix where each cell contains the shortest distance and the intermediate node (if any).
 shortestPaths :: [[Int]] -> [[(Int, Maybe Int)]]
-shortestPaths distanceMatrix = foldl update initialPaths [0..numNodes-1]
+shortestPaths distanceMatrix = foldl update initialPaths [0 .. numNodes - 1]
   where
     numNodes = length distanceMatrix
-    initialPaths = [[(if distanceMatrix!!i!!j == -1 then maxBound else distanceMatrix!!i!!j, Nothing)
-      | j <- [0..numNodes-1]] | i <- [0..numNodes-1]]
+    initialPaths =
+      [ [ (if distanceMatrix !! i !! j == -1 then maxBound else distanceMatrix !! i !! j, Nothing)
+        | j <- [0 .. numNodes - 1]
+        ]
+      | i <- [0 .. numNodes - 1]
+      ]
     update paths k =
-      [[minimumDistance i j k paths | j <- [0..numNodes-1]] | i <- [0..numNodes-1]]
+      [[minimumDistance i j k paths | j <- [0 .. numNodes - 1]] | i <- [0 .. numNodes - 1]]
     minimumDistance i j k paths =
-      let (distIJ, viaIJ) = paths!!i!!j
-          (distIK, _) = paths!!i!!k
-          (distKJ, _) = paths!!k!!j
+      let (distIJ, viaIJ) = paths !! i !! j
+          (distIK, _) = paths !! i !! k
+          (distKJ, _) = paths !! k !! j
           newDist = distIK + distKJ
-      in if distIK /= maxBound && distKJ /= maxBound && distIJ > newDist
-         then (newDist, Just k)
-         else (distIJ, viaIJ)
-
+       in if distIK /= maxBound && distKJ /= maxBound && distIJ > newDist
+            then (newDist, Just k)
+            else (distIJ, viaIJ)
 
 -- | Reconstruct the shortest path between two airports.
 -- Uses the output from the Floyd-Warshall algorithm to trace the path.
@@ -68,12 +72,10 @@ shortestPaths distanceMatrix = foldl update initialPaths [0..numNodes-1]
 -- Returns a list of airport IDs representing the path.
 pathReconstruct :: Int -> Int -> [[(Int, Maybe Int)]] -> [Int]
 pathReconstruct i j paths
-  | i == j    = [i]
+  | i == j = [i]
   | otherwise = case snd (paths !! i !! j) of
       Nothing -> [i, j]
-      Just k  -> pathReconstruct i k paths ++ tail (pathReconstruct k j paths)
-
-
+      Just k -> pathReconstruct i k paths ++ tail (pathReconstruct k j paths)
 
 -- | Builds an airport network from a distance matrix.
 -- Computes shortest paths and creates Airport objects with connection information.
@@ -85,34 +87,37 @@ buildAirportGraph :: [[Int]] -> [Airport]
 buildAirportGraph distanceMatrix =
   let pathsMatrix = shortestPaths distanceMatrix
       numNodes = length distanceMatrix
-  in [ AirportInternal {
-      airportID = i,
-      connections = Map.fromList [
-        (j, PathInfo (pathReconstruct i j pathsMatrix) (fst (pathsMatrix !! i !! j)))
-        | j <- [0..numNodes-1], i /= j, (fst (pathsMatrix!!i!!j)) /= maxBound
+   in [ AirportInternal
+          { airportID = i,
+            connections =
+              Map.fromList
+                [ (j, PathInfo (pathReconstruct i j pathsMatrix) (fst (pathsMatrix !! i !! j)))
+                | j <- [0 .. numNodes - 1],
+                  i /= j,
+                  (fst (pathsMatrix !! i !! j)) /= maxBound
+                ]
+          }
+      | i <- [0 .. numNodes - 1]
       ]
-    } | i <- [0..numNodes-1]]
-
-
 
 -- | Gets the distance to a specific destination airport.
--- Returns -1 if there is no path to the destination.
+-- Returns Nothing if there is no path to the destination.
+-- For paths to itself, returns Just 0.
 --
--- @airport@ Source airport
--- @to@ Destination airport ID
---
--- >>> getDistanceTo sourceAirport 5
--- 320
+-- @param airport@ Source airport
+-- @param destinationId@ Destination airport ID
 getDistanceTo :: Airport -> Int -> Maybe Int
-getDistanceTo (AirportInternal {connections = con}) to =  fmap distance (Map.lookup to con)
+getDistanceTo (AirportInternal {connections = cons, airportID = sourceId}) destinationId
+  | sourceId == destinationId = Just 0
+  | otherwise = fmap distance (Map.lookup destinationId cons)
 
 -- | Gets the path to a specific destination airport.
 -- Returns an empty list if there is no path to the destination.
+-- Returns a single-element list containing the airport ID if the source and destination are the same.
 --
--- @airport@ Source airport
--- @to@ Destination airport ID
---
--- >>> getPathTo sourceAirport 5
--- [0, 2, 5]
+-- @param airport@ Source airport
+-- @param destinationId@ Destination airport ID
 getPathTo :: Airport -> Int -> [Int]
-getPathTo (AirportInternal {connections = con}) to = maybe [] path (Map.lookup to con)
+getPathTo (AirportInternal {connections = cons, airportID = sourceId}) destinationId
+  | sourceId == destinationId = [destinationId]
+  | otherwise = maybe [] path (Map.lookup destinationId cons)

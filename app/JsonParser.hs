@@ -1,49 +1,55 @@
-{-# LANGUAGE DeriveGeneric, ScopedTypeVariables, OverloadedStrings #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 -- | Module for parsing JSON input files related to package delivery system.
 -- This module provides functions to parse constraints, distance matrices, and package data.
 module JsonParser
-(
-  parseConstraints,
-  parseInputFiles,
-) where
-  
-import PackageType(createANewPackage, PackageData)
+  ( parseConstraints,
+    parseInputFiles,
+  )
+where
+
 import AirplaneType
 import AirportGraph
-import Data.Aeson
-import GHC.Generics
-import System.Exit (die)
-import Control.Exception (catch, SomeException)
-import qualified Data.ByteString.Lazy as BL
+import Control.Exception (SomeException, catch)
 import Control.Monad (unless)
-import Data.Time
-import Text.Read
+import Data.Aeson
 import Data.Aeson.Types
+import qualified Data.ByteString.Lazy as BL
 import Data.List.Split
+import GHC.Generics
+import PackageType (PackageData, createANewPackage)
 import System.Environment
+import System.Exit (die)
+import Text.Read
 import Text.Regex.TDFA
 
 -- | Constraints for the package delivery system.
 -- Contains specifications for planes, weight capacity, and speed.
 data Constraints = Constraints
-  { numOfPlanes :: Int     -- ^ Number of delivery planes available
-  , weightCapacity :: Int  -- ^ Maximum weight capacity per plane
-  , speed :: Int           -- ^ Speed of the planes
-  } deriving (Show, Generic)
+  { -- | Number of delivery planes available
+    numOfPlanes :: Int,
+    -- | Maximum weight capacity per plane
+    weightCapacity :: Int,
+    -- | Speed of the planes
+    speed :: Int
+  }
+  deriving (Show, Generic)
 
 instance FromJSON Constraints
+
 instance ToJSON Constraints
 
 -- | JSON parser instance for 'PackageData'.
 -- Parses package information including ID, weight, arrival time, deadline, and destination.
 instance FromJSON PackageData where
   parseJSON = withObject "Failed to Parse Package Data" $ \v -> do
-    pkgId              <- v .: "id"
-    weight          <- v .: "weight"
-    arrivalTime     <- v .: "arrivalTime" >>= parseTimeField 
-    deadlineTime    <- v .: "deadlineTime" >>= parseTimeField 
-    destination     <- v .: "destination"
+    pkgId <- v .: "id"
+    weight <- v .: "weight"
+    arrivalTime <- v .: "arrivalTime" >>= parseTimeField
+    deadlineTime <- v .: "deadlineTime" >>= parseTimeField
+    destination <- v .: "destination"
     return $ createANewPackage pkgId weight arrivalTime deadlineTime destination
 
 -- | Parse a time string in format "HH:MM" into minutes past midnight.
@@ -74,20 +80,21 @@ convertTimeOFDayToMinutes timeStr =
       hour <- readMaybe hourStr
       minute <- readMaybe minuteStr
       return (hour * 60 + minute)
-    _ -> Nothing  
+    _ -> Nothing
 
 -- | Splits a string based on a delimiter.
--- Returns a list of substrings.
 --
+-- @param delim@ The delimiter to split on
+-- @param str@ The string to be split--
 -- >>> splitByDelim ":" "14:30"
 -- ["14","30"]
 splitByDelim :: String -> String -> [String]
-splitByDelim delimiter str  = splitOn delimiter str
+splitByDelim = splitOn
 
--- | Parse package data from a JSON file.
+-- | Parse packages data from a JSON file.
 -- Returns a list of PackageData objects or terminates with an error.
 --
--- @filePath@ Path to the JSON file containing package data
+-- @param filePath@ ath to the JSON file containing packages data
 parsePackageData :: String -> IO [PackageData]
 parsePackageData filePath = do
   fileContent <- getFileContent filePath
@@ -98,15 +105,15 @@ parsePackageData filePath = do
 -- | Parse constraints from a JSON file.
 -- Returns a Constraints object or terminates with an error.
 --
--- @filePath@ Path to the JSON file containing constraints
+-- @param filePath@ Path to the JSON file containing constraints
 parseConstraints :: String -> IO Constraints
 parseConstraints filePath = do
   fileContent <- getFileContent filePath
   case decode fileContent of
     Nothing -> die $ "Error parsing JSON From file Path" ++ filePath
     Just constraints -> do
-                         unless (verifyConstraints constraints) $ die "Constraint values must be greater than 0"
-                         return constraints
+      unless (verifyConstraints constraints) $ die "Constraint values must be greater than 0"
+      return constraints
 
 -- | Verify that all constraint values are valid (greater than 0).
 -- Returns True if all constraints are valid, False otherwise.
@@ -116,24 +123,25 @@ verifyConstraints constraints = all (> 0) [numOfPlanes constraints, weightCapaci
 -- | Parse distance matrix from a JSON file.
 -- Returns a matrix of distances or terminates with an error.
 --
--- @filePath@ Path to the JSON file containing the distance matrix
+-- @param filePath@ Path to the JSON file containing the distance matrix
 parseDistanceMatrix :: String -> IO [[Int]]
 parseDistanceMatrix filePath = do
   fileContent <- getFileContent filePath
   let distanceMatrix = decode fileContent :: Maybe [[Int]]
   case distanceMatrix of
     Nothing -> die $ "Error parsing JSON From file Path" ++ filePath
-    Just distanceMatrix -> do
-                           let resultOfVerification = verifyDistanceMatrix distanceMatrix
-                           unless (fst resultOfVerification) $ die $ snd resultOfVerification
-                           return distanceMatrix
+    Just matrix -> do
+      let resultOfVerification = verifyDistanceMatrix matrix
+      unless (fst resultOfVerification) $ die $ snd resultOfVerification
+      return matrix
 
 -- | Read file contents safely, with error handling.
 -- Returns the file content as a ByteString or terminates with an error message.
 --
 -- @filePath@ Path to the file to read
 getFileContent :: String -> IO BL.ByteString
-getFileContent filePath = BL.readFile filePath `catch` \ (e :: SomeException) ->
+getFileContent filePath =
+  BL.readFile filePath `catch` \(e :: SomeException) ->
     die $ "Error reading file: " ++ filePath ++ "\nError: " ++ show e
 
 -- | Verify that a distance matrix is valid.
@@ -143,24 +151,24 @@ getFileContent filePath = BL.readFile filePath `catch` \ (e :: SomeException) ->
 -- * has valid distances (>= -1)
 -- * represents an undirected graph (symmetric)
 --
+-- @param matrix@ The distance matrix to check
 -- Returns a tuple with a boolean result and an error message if applicable.
 verifyDistanceMatrix :: [[Int]] -> (Bool, String)
 verifyDistanceMatrix matrix
-    | null matrix = (False, "Distance matrix cannot be empty")
-    | any (/= length matrix) (map length matrix) = (False, "Matrix must be square")
-    | any (any (< (-1))) matrix = (False, "Matrix elements must be >= -1")
-    | isNotUndirected matrix = (False, "Graph is not undirected")
-    | otherwise = (True, "")
-    where isNotUndirected matrix = any (\(i, j) -> matrix!!j!!i /= matrix!!i!!j) [(i, j) | i <- [0..length matrix - 1], j <- [0..length matrix - 1]]
-
-
+  | null matrix = (False, "Distance matrix cannot be empty")
+  | any (/= length matrix) (map length matrix) = (False, "Matrix must be square")
+  | any (any (< (-1))) matrix = (False, "Matrix elements must be >= -1")
+  | isNotUndirected matrix = (False, "Graph is not undirected")
+  | otherwise = (True, "")
+  where
+    isNotUndirected matrix = any (\(i, j) -> matrix !! j !! i /= matrix !! i !! j) [(i, j) | i <- [0 .. length matrix - 1], j <- [0 .. length matrix - 1]]
 
 -- | Parse all input files required for the package delivery system.
 -- Takes command line arguments and returns a tuple containing:
 --
 -- * A graph of airports derived from the distance matrix
 -- * The package data for deliveries
--- * A fleet of airplanes created from the constraints
+-- * A fleet of airplanes created with the constraints
 --
 -- The function terminates with an error message if parsing fails or if arguments are invalid.
 --
@@ -170,25 +178,22 @@ verifyDistanceMatrix matrix
 -- 3. Constraints JSON file
 parseInputFiles :: IO ([Airport], [PackageData], [Airplane])
 parseInputFiles = do
-    args <- getArgs
-    if length args /= 3
-        then die "Incorrect usage, expected: ./program distance_matrix.json package_data.json constraints.json"
-        else do
-            [distFile, packageFile, constrFile] <- return args
-            distData <- parseDistanceMatrix distFile
-            pkgData <- parsePackageData packageFile
-            constrData <- parseConstraints constrFile
-            let airportGraph = buildAirportGraph distData
-            let airplanes = createMultipleAirplanes (weightCapacity constrData) (speed constrData) (numOfPlanes constrData)
-            return (airportGraph, pkgData, airplanes)
+  args <- getArgs
+  if length args /= 3
+    then die "Incorrect usage, expected: ./program distance_matrix.json package_data.json constraints.json"
+    else do
+      [distFile, packageFile, constrFile] <- return args
+      distData <- parseDistanceMatrix distFile
+      pkgData <- parsePackageData packageFile
+      constrData <- parseConstraints constrFile
+      let airportGraph = buildAirportGraph distData
+      let airplanes = createMultipleAirplanes (weightCapacity constrData) (speed constrData) (numOfPlanes constrData)
+      return (airportGraph, pkgData, airplanes)
 
 -- | Check if a string is in the expected time format HH:MM.
 -- Hours can be any non-negative integer, minutes must be 00-59.
 --
--- >>> isTimeFormat "14:30"
--- True
---
--- >>> isTimeFormat "abc"
--- False
+-- @param str@ string to check
+-- Reference: got the Regex from Chat GPT
 isTimeFormat :: String -> Bool
-isTimeFormat str =  (str :: String) =~ ("^([0-9]+):[0-5][0-9]$" :: String)
+isTimeFormat str = (str :: String) =~ ("^([0-9]+):[0-5][0-9]$" :: String)
