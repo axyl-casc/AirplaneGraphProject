@@ -1,17 +1,14 @@
 -- | Module for creating and managing airport graph
 -- Provides functionality for building airport network,
 -- and retrieving distances and paths between airports.
-module AirportGraph
-(
-  -- * Data Types
-  Airport,
-  -- * Graph Construction
+module AirportGraph (
+  Airport(..),
+  PathInfo(..),
   buildAirportGraph,
-  -- * Graph Operations
   getDistanceTo,
   getPathTo
-)
-where
+) where
+
 
 import qualified Data.Map as Map
 import Data.Map (Map)

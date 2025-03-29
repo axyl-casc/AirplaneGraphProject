@@ -23,7 +23,7 @@ data PackageData = PackageInternal
   , arrivalTime :: Int  -- ^ Time of arrival at depot in minutes
   , deadlineTime :: Int -- ^ Deadline for delivery in minutes
   , destination :: Int  -- ^ Destination identifier
-  } deriving (Show)
+  } deriving (Show, Eq)
 
 -- | Creates a new package with the specified properties.
 --

@@ -164,3 +164,5 @@ cabal.project.local
 cabal.project.local~
 .HTF/
 .ghc.environment.*
+/dist-newstyle
+/dist-newstyle
