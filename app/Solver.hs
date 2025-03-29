@@ -8,7 +8,6 @@ import AirplaneType
 import AirportGraph
 import Data.Function (on)
 import Data.List (delete, minimumBy)
-import qualified Data.Map as Map
 import PackageType
 
 -- | Represents the state of the best solution found so far.

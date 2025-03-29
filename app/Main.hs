@@ -1,11 +1,8 @@
 module Main where
 import JsonParser 
-import PackageType
-import AirplaneType
-import AirportGraph (buildAirportGraph, getDistanceTo)
 import Solver
 
-
+-- | The main entry point for the application. This function initializes the
 main :: IO ()
 
 -- TO Do : figure out the package time problem

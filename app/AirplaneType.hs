@@ -21,8 +21,6 @@ where
 
 import AirportGraph
 import Data.List (minimumBy)
-import qualified Data.Map as Map
-import Data.Maybe (catMaybes)
 import Data.Ord (comparing)
 import PackageType
 
@@ -160,12 +158,12 @@ tryAddPackage network pkg plane
 
 
 evaluateDeliveryRouteFeasibility :: [PackageData] -> [Airport] -> Int -> Int -> Int -> Double -> Maybe Double
-evaluateDeliveryRouteFeasibility [] network currTime currLoc _ currDist
+evaluateDeliveryRouteFeasibility [] network _ currLoc _ currDist
   | currLoc == 0 = Just currDist
   | otherwise = getDistanceTo (network !! currLoc) 0 >>= \x -> Just (fromIntegral x + currDist)
-evaluateDeliveryRouteFeasibility (p : pkgs) network currTime currLoc speed currDist = do
+evaluateDeliveryRouteFeasibility (p : pkgs) network currTime currLoc airplaneSpeed currDist = do
   distToNewDest <- lookupConnection currLoc (getDestinationOfPackage p) -- Returns a maybe so needs to be extracted
-  let travelTime = (fromIntegral distToNewDest / fromIntegral speed) * 60
+  let travelTime = (fromIntegral distToNewDest  / fromIntegral airplaneSpeed :: Double) * 60  -- Need to explicitly infer the type so GHc does not give a warning
   let arrivalTime = currTime + round travelTime
 
   if arrivalTime > getDeadlineTimeOfPackage p -- Check if deadline is met
@@ -176,7 +174,7 @@ evaluateDeliveryRouteFeasibility (p : pkgs) network currTime currLoc speed currD
         network
         arrivalTime
         (getDestinationOfPackage p) -- Update current location
-        speed
+        airplaneSpeed
         (currDist + fromIntegral distToNewDest) -- Add to accumulated distance
   where
     lookupConnection from to = getDistanceTo (network !! from) to
