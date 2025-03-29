@@ -42,15 +42,17 @@ scheduleDeliveries unassigned airplanes distSoFar solution network
     pkg = selectNextPackage unassigned
     rest = delete pkg unassigned
 
+
     tryPlane :: Solution -> (Int, Airplane) -> Solution
     tryPlane sol (idx, plane) =
-        case tryAddPackage plane pkg of
+        case tryAddPackage network pkg plane of
             Just updatedPlane ->
                 let newPlanes = updatePlane idx updatedPlane airplanes
                     distDelta = estimateExtraDistance plane updatedPlane network
                     newDist = distSoFar + distDelta
                 in scheduleDeliveries rest newPlanes newDist sol network
             Nothing -> sol
+
 
 -- | Select the package with the earliest deadline.
 selectNextPackage :: [PackageData] -> PackageData

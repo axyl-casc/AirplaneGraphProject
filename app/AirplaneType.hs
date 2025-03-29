@@ -17,9 +17,14 @@ module AirplaneType
   getDepartureTimeFromOrigin,
   tryAddPackage
 ) where
+import AirportGraph (Airport(..), PathInfo(..))
 
 import PackageType
 import PackageType (getWeightOfPackage)
+import Data.List (minimumBy)
+import Data.Ord (comparing)
+import qualified Data.Map as Map
+
 
 -- | Represents an airplane used for package delivery.
 -- Contains information about the airplane's capacity, load, and current status.
@@ -120,13 +125,95 @@ getReturnTimeToOrigin = returnTimeToOrigin
 getDepartureTimeFromOrigin :: Airplane -> Int
 getDepartureTimeFromOrigin = departureTimeFromOrigin
 
-tryAddPackage :: Airplane -> PackageData -> Maybe Airplane
-tryAddPackage plane pkgToAdd
-  | getCurrentLoad plane + getWeightOfPackage pkgToAdd > getTotalCapacity plane = Nothing
-  | otherwise = Just $ plane { 
-      packages = packages plane ++ [pkgToAdd],
-      currentLoad = getCurrentLoad plane + getWeightOfPackage pkgToAdd
-    }
+  
+evaluateRouteWithInsertion
+  :: [Airport]     -- ^ Airport network
+  -> Airplane      -- ^ Current airplane
+  -> PackageData   -- ^ Package to insert
+  -> Int           -- ^ Insertion position
+  -> Int           -- ^ Departure time
+  -> (Bool, Double)
+evaluateRouteWithInsertion network plane pkg pos departureTime =
+  case runLeg pre departureTime 0 of
+    (False, dist1, _) -> (False, dist1)
+    (True, dist1, time1) ->
+      let (ok2, dist2, time2) = runOne pkg time1 dist1
+      in if not ok2 then (False, dist2)
+         else case runLeg post time2 dist2 of
+           (False, dist3, _) -> (False, dist3)
+           (True, dist3, _) ->
+             case lookupConnection (getDestinationOfPackage (lastOr pkg post)) 0 of
+               Nothing -> (False, dist3)
+               Just distBack -> (True, dist3 + fromIntegral distBack)
+  where
+    allPkgs = getPackages plane
+    (pre, post) = splitAt pos allPkgs
+
+    runLeg :: [PackageData] -> Int -> Double -> (Bool, Double, Int)
+    runLeg [] time dist = (True, dist, time)
+    runLeg (p:ps) currentTime accDist =
+      case lookupConnection currentLoc (getDestinationOfPackage p) of
+        Nothing -> (False, accDist, currentTime)
+        Just distToNext ->
+          let travelTime = (fromIntegral distToNext / fromIntegral (getSpeed plane)) * 60
+              arrivalTime = currentTime + round travelTime
+          in if arrivalTime > getDeadlineTimeOfPackage p
+             then (False, accDist + fromIntegral distToNext, arrivalTime)
+             else runLeg ps arrivalTime (accDist + fromIntegral distToNext)
+      where currentLoc = if null pre then 0 else getDestinationOfPackage (last pre)
+
+    runOne :: PackageData -> Int -> Double -> (Bool, Double, Int)
+    runOne p currentTime accDist =
+      case lookupConnection currentLoc (getDestinationOfPackage p) of
+        Nothing -> (False, accDist, currentTime)
+        Just distToNext ->
+          let travelTime = (fromIntegral distToNext / fromIntegral (getSpeed plane)) * 60
+              arrivalTime = currentTime + round travelTime
+          in if arrivalTime > getDeadlineTimeOfPackage p
+             then (False, accDist + fromIntegral distToNext, arrivalTime)
+             else (True, accDist + fromIntegral distToNext, arrivalTime)
+      where currentLoc = if null pre then 0 else getDestinationOfPackage (last pre)
+
+    lastOr fallback [] = fallback
+    lastOr _ xs = last xs
+
+    lookupConnection from to =
+      Map.lookup to (connections (network !! from)) >>= Just . distance
+
+
+tryAddPackage :: [Airport] -> PackageData -> Airplane -> Maybe Airplane
+
+tryAddPackage network pkg plane
+  | getCurrentLoad plane + getWeightOfPackage pkg > getTotalCapacity plane = Nothing
+  | null feasibleInsertions = Nothing
+  | otherwise = Just updatedPlane
+  where
+    earliestDeparture = max (getArrivalTimeOfPackage pkg) (getDepartureTimeFromOrigin plane)
+    positions = [0 .. length (getPackages plane)]
+    evaluated = map (\pos -> (pos, evaluateRouteWithInsertion network plane pkg pos earliestDeparture)) positions
+    feasibleInsertions = filter (fst . snd) evaluated
+
+    (bestPos, (_, bestDist)) =
+      minimumBy (comparing (snd . snd)) feasibleInsertions
+
+    updatedPackages = insertAt bestPos pkg (getPackages plane)
+    updatedLoad = getCurrentLoad plane + getWeightOfPackage pkg
+    updatedReturn = earliestDeparture + round ((bestDist / fromIntegral (getSpeed plane)) * 60)
+
+    updatedPlane = plane {
+        packages = updatedPackages,
+        currentLoad = updatedLoad,
+        totalDistanceTraveled = bestDist,
+        departureTimeFromOrigin = earliestDeparture,
+        returnTimeToOrigin = updatedReturn
+      }
+
+-- Helper to insert a value at a specified position in a list
+insertAt :: Int -> a -> [a] -> [a]
+insertAt 0 x xs = x : xs
+insertAt n x (y:ys) = y : insertAt (n - 1) x ys
+insertAt _ _ []     = error "insertAt: Index out of bounds"
+
 
 -- Add other getter or manipulator functions as required by your application...
 -- For example, a function to add a package might look like:
