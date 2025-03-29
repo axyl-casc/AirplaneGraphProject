@@ -79,7 +79,8 @@ executable AirplaneGraphProject
     other-modules:    JsonParser,
                       AirportGraph,
                       PackageType,
-                      AirplaneType
+                      AirplaneType,
+                      Solver
 
 
 

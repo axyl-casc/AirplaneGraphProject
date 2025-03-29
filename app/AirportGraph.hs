@@ -103,8 +103,8 @@ buildAirportGraph distanceMatrix =
 --
 -- >>> getDistanceTo sourceAirport 5
 -- 320
-getDistanceTo :: Airport -> Int -> Int
-getDistanceTo (AirportInternal {connections = con}) to = maybe (-1) distance (Map.lookup to con)
+getDistanceTo :: Airport -> Int -> Maybe Int
+getDistanceTo (AirportInternal {connections = con}) to =  fmap distance (Map.lookup to con)
 
 -- | Gets the path to a specific destination airport.
 -- Returns an empty list if there is no path to the destination.
