@@ -13,7 +13,7 @@ function scheduleDeliveries(unassignedPackages, airplanes, currentSolutionTotal,
 	optimalSolution.totalNodesExplored++;
 
 	// Prune if this branch can't be better than the current best solution
-	if (currentSolutionTotal >= optimalSolution.optimalMinDistance) {
+	if (currentSolutionTotal > optimalSolution.optimalMinDistance) {
 		return optimalSolution;
 	}
 

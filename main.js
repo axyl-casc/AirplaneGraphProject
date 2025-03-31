@@ -58,14 +58,13 @@ function printSolution(optimalDeliverySchedule, airportNetwork, numOfPackages) {
 	report.push(
 		`Total Distance for optimal solution: ${optimalDeliverySchedule.optimalMinDistance} km`,
 	);
-
-	report.push(`Number of Airplanes Used: ${deliveryPlan.length}`);
-	report.push(`Airplane Capacity: ${deliveryPlan[0].totalWeightCapacity} kg`);
-	report.push(`Airplane Speed: ${deliveryPlan[0].speed} km/h`);
+	report.push('');
+	report.push('');
+	report.push('============');
+	report.push('Airplane Assignments');
+	report.push('============');
 	report.push('');
 
-	report.push(`Total Packages Delivered: ${numOfPackages}`);
-	report.push('');
 
 	// Each Airplane's Details
 	deliveryPlan.forEach((airplane, index) => {
@@ -75,7 +74,6 @@ function printSolution(optimalDeliverySchedule, airportNetwork, numOfPackages) {
 		report.push(`Departure Time: ${formatTime(airplane.departureTimeOrigin)} (HH:MM)`);
 		report.push(`Return Time: ${formatTime(airplane.returnTimeOrigin)} (HH:MM)`);
 		report.push('');
-
 		report.push('ROUTE DETAILS:');
 		let currentAirport = 0; // Origin
 		let currentTime = airplane.departureTimeOrigin;
