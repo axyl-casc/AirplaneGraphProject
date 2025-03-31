@@ -80,7 +80,8 @@ executable AirplaneGraphProject
                       AirportGraph,
                       PackageType,
                       AirplaneType,
-                      Solver
+                      Solver,
+                      PrettyPrintSolution
 
 
 

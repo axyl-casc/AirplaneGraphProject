@@ -70,3 +70,5 @@ cabal run AirplaneGraphProject -- ./tests/integration_tests/16/16_dist.json ./te
 
 echo ""
 echo "All tests completed!"
+
+$SHELL

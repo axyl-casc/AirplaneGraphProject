@@ -11,6 +11,7 @@ module AirportGraph
     -- * Graph Operations
     getDistanceTo,
     getPathTo,
+    getAirportID,
   )
 where
 
@@ -121,3 +122,8 @@ getPathTo :: Airport -> Int -> [Int]
 getPathTo (AirportInternal {connections = cons, airportID = sourceId}) destinationId
   | sourceId == destinationId = [destinationId]
   | otherwise = maybe [] path (Map.lookup destinationId cons)
+
+
+getAirportID :: Airport -> Int
+getAirportID = airportID
+

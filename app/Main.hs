@@ -1,6 +1,7 @@
 module Main where
 import JsonParser 
 import Solver
+import PrettyPrintSolution
 
 -- | The main entry point for the application. This function initializes the
 main :: IO ()
@@ -18,10 +19,6 @@ main =
         }
 
     let finalSolution = scheduleDeliveries pkgData airplanes 0.0 initialSolution airportGraph
+    prettyPrintSolution finalSolution airportGraph
 
-    putStrLn "=== FINAL DELIVERY PLAN ==="
-    putStrLn $ "Total Nodes Explored: " ++ show (nodesExplored finalSolution)
-    putStrLn $ "Valid Solutions Found: " ++ show (validCount finalSolution)
-    putStrLn $ "Optimal Distance: " ++ show (bestDistance finalSolution)
-    putStrLn $ "Airplane Assignments:"
-    mapM_ print (bestPlanes finalSolution) 
+
