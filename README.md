@@ -107,6 +107,7 @@ This project supports both **JavaScript (Node.js)** and **Haskell** implementati
    Make sure you have Node.js installed. You can download it from [nodejs.org](https://nodejs.org/).
 
 2. **Run the Program**  (Example JSON files, below command doesn't actually run because the files don't exist)
+
    From the project root directory, run:
    ```bash
    node main.js distance_matrix.json package_data.json constraints.json
