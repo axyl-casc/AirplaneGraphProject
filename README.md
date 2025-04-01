@@ -54,7 +54,15 @@ TEMOO Cargo is an expedited cargo delivery system that schedules cargo planes fr
 1. **Distance Matrix (e.g., `distance_matrix.json`)**  
    - A 2D array where the entry at `[i][j]` is the distance from airport `i` to airport `j`.  
    - `-1` indicates no direct route between `i` and `j`.  
-   - Must be a valid square matrix of non-negative integers (aside from `-1`).
+   - Must be a valid square matrix of non-negative integers (aside from `-1`).  
+
+   **Example of JSON input:**  
+   ```json
+      [
+          [0, 100],
+          [100, 0]
+      ]
+    ```
 
 2. **Package Data (e.g., `package_data.json`)**  
    - Array of JSON objects, each describing one package:  
@@ -64,12 +72,27 @@ TEMOO Cargo is an expedited cargo delivery system that schedules cargo planes fr
      - `deadlineTime`: String in "HH:MM" format, must be delivered by this time (within 24 hours)  
      - `destination`: Integer, ID of the destination airport  
 
-3. **Constraints (e.g., `constraints.json`)**  
-   - An object with plane and flight-related settings:  
-     - `numOfPlanes`: Integer, how many planes are available  
-     - `weightCapacity`: Integer, max cargo weight each plane can hold (kg)  
-     - `speed`: Integer, plane speed (km/h)
+   **Example of JSON input:**  
+   ```json
+      [
+          { "id": 1, "weight": 500, "arrivalTime": "08:00", "deadlineTime": "12:00", "destination": 1 },
+          { "id": 2, "weight": 500, "arrivalTime": "10:00", "deadlineTime": "12:00", "destination": 1 }
+      ]
+   ```
 
+3. **Constraints (e.g., constraints.json)**  
+   - An object with plane and flight-related settings:  
+     - numOfPlanes: Integer, how many planes are available  
+     - weightCapacity: Integer, max cargo weight each plane can hold (kg)  
+     - speed: Integer, plane speed (km/h)
+   Example of JSON input:
+```json
+      {
+          "numOfPlanes": 2,
+          "weightCapacity": 500,
+          "speed": 700
+      }
+```
 ---
 
 ## How to Compile and Run
@@ -80,14 +103,22 @@ This project supports both **JavaScript (Node.js)** and **Haskell** implementati
 
 ### JavaScript (Node.js) Version
 
+Make sure you are in /main/JavascriptSolution to compile/run the Javascript version of this program
+
 1. **Install Node.js**  
    Make sure you have Node.js installed. You can download it from [nodejs.org](https://nodejs.org/).
 
-2. **Run the Program**  
+2. **Run the Program**  (Example JSON files, below command doesn't actually run because the files don't exist)
+
    From the project root directory, run:
    ```bash
    node main.js distance_matrix.json package_data.json constraints.json
    ```
+To run all test cases, run the following bash script:
+```bash
+sh runTest.sh
+```
+**Note** Test Case 16, may take a while to finish. (upwards of 2 minutes depending on hardware).
 
 3. **Output**  
    - Outputs the optimal delivery schedule to the console.  
@@ -96,6 +127,8 @@ This project supports both **JavaScript (Node.js)** and **Haskell** implementati
 ---
 
 ### Haskell Version
+
+Make sure you are in /main/HaskellSolution to compile/run the Javascript version of this program
 
 1. **Compile the Haskell Code**  
    If using `cabal`, run:
@@ -158,21 +191,39 @@ A successful run displays (or writes to `solution.txt` or similar):
 
 ## Project Structure
 
-While your **Haskell** implementation may differ in file layout, below is how the Node.js reference solution is organized. You can mirror a similar pattern for Haskell modules:
-
 ```
-project-root/
-├─ compile.sh              # Your Haskell compile script or Stack commands
-├─ main.js                 # Main entry point (Node.js reference)
-├─ parser.js               # Input file parsing & validation
-├─ airport_graph_builder.js # Constructs airport network with shortest paths
-├─ package.js              # Data structure/class for packages
-├─ airplane.js             # Data structure/class for airplane & route feasibility
-├─ pathFinder.js           # Core scheduling algorithm
-├─ constraints.json        # Example constraints file
-├─ distance_matrix.json    # Example distance matrix file
-├─ package_data.json       # Example package data file
-└─ README.md               # This file (project documentation)
+main
+|   .gitignore
+|   .prettierrc
+|   airplane.js
+|   airport_graph_builder.js
+|   eslint.config.mjs
+|   main.js
+|   package-lock.json
+|   package.js
+|   package.json
+|   parser.js
+|   pathFinder.js
+|   README.md
+|   runTest.sh
+|   structure.md
+|   
++---sample_input_files
+|       sample_constraints.json
+|       sample_distance.json
+|       sample_package.json
+|       
+\---tests
+    |   tests.md
+    |   
+    +---integration_tests
+    |   (various test cases, with corresponding contraint, distance matrix, and package data are here)
+    |           
+    \---unit_tests
+            airplane.test.js
+            airport_graph_builder.test.js
+            parser.test.js
+       
 ```
 
 ---
