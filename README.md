@@ -1,4 +1,4 @@
-# Programming Paradigms Project (Haskell Version)
+# Programming Paradigms Project
 
 Welcome to the **TEMOO Cargo** expedited shipping service simulator! This project demonstrates how to schedule and route cargo plane deliveries to various airports across Canada, subject to constraints such as weight capacity, flight distances, and package deadlines. Although this README references a Haskell implementation, the core concepts and input/output formats described here align closely with the approach used in the reference JavaScript/Node.js version.
 
@@ -103,7 +103,7 @@ This project supports both **JavaScript (Node.js)** and **Haskell** implementati
 
 ### JavaScript (Node.js) Version
 
-Make sure you are in /main/JavascriptSolution to compile/run the Javascript version of this program
+Make sure you are in the Javascript folder to compile/run the Javascript version of this program.
 
 1. **Install Node.js**  
    Make sure you have Node.js installed. You can download it from [nodejs.org](https://nodejs.org/).
@@ -128,7 +128,7 @@ sh runTest.sh
 
 ### Haskell Version
 
-Make sure you are in /main/HaskellSolution to compile/run the Javascript version of this program
+Make sure you are in Haskell folder to compile/run the Haskell version of this program.
 
 1. **Compile the Haskell Code**  
    If using `cabal`, run:
@@ -136,23 +136,21 @@ Make sure you are in /main/HaskellSolution to compile/run the Javascript version
    cabal clean
    cabal build
    ```
-   If using `compile.sh`, ensure it contains:
-   ```bash
-   ghc Main.hs -o temoo_cargo
-   ```
 
 2. **Run the Program**  
-   Once compiled, execute the program with the same input files:
+   Once compiled, execute the program with the same input files: (example input files, below command doesn't run)
    ```bash
-   ./temoo_cargo distance_matrix.json package_data.json constraints.json
+   cabal run AirplaneGraphProject -- distance_matrix.json package_data.json constraints.json
    ```
 
-3. **Output**  
-   - Displays scheduling information similar to the Node.js version.  
-   - May print to the console or write to `solution.txt` depending on implementation.
----
+To run all test cases, run the following bash script:
+```bash
+sh compileAndRun.sh
+```
 
-Feel free to use either implementation depending on your workflow or platform. The input/output formats are identical to ensure consistency across both.
+3. **Output**  
+   - Displays scheduling information similar to the Node.js version in the console.  
+
 ---
 
 ## Algorithm & Approach
@@ -177,7 +175,7 @@ Feel free to use either implementation depending on your workflow or platform. T
 ---
 
 ## Output & Results
-A successful run displays (or writes to `solution.txt` or similar):
+A successful run displays
 
 - **Total Distance** of the best solution.  
 - **Number of Airplanes Used**.  
@@ -189,63 +187,6 @@ A successful run displays (or writes to `solution.txt` or similar):
 
 ---
 
-## Project Structure
-
-```
-main
-|   .gitignore
-|   .prettierrc
-|   airplane.js
-|   airport_graph_builder.js
-|   eslint.config.mjs
-|   main.js
-|   package-lock.json
-|   package.js
-|   package.json
-|   parser.js
-|   pathFinder.js
-|   README.md
-|   runTest.sh
-|   structure.md
-|   
-+---sample_input_files
-|       sample_constraints.json
-|       sample_distance.json
-|       sample_package.json
-|       
-\---tests
-    |   tests.md
-    |   
-    +---integration_tests
-    |   (various test cases, with corresponding contraint, distance matrix, and package data are here)
-    |           
-    \---unit_tests
-            airplane.test.js
-            airport_graph_builder.test.js
-            parser.test.js
-       
-```
-
----
-
-## Contributing
-1. **Fork** this repository.  
-2. **Create** a feature branch.  
-3. **Commit** changes with meaningful messages.  
-4. **Open** a Pull Request describing your modifications or additions.  
-
-We welcome improvements to:
-- Algorithmic efficiency  
-- Additional constraint support (e.g., multi-hub)  
-- Testing and coverage  
-- Documentation clarity  
-
----
-
-## License
-This project is distributed under the MIT License. Feel free to use, modify, and distribute it in your own projects, keeping the above license intact.
-
----
 
 **Thank you for using TEMOO Cargo’s Haskell-based shipping simulator!** If you have any questions or feature requests, please open an issue. Enjoy building and optimizing your cargo delivery schedules!
 
