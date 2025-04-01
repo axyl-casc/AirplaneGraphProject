@@ -187,8 +187,6 @@ A successful run displays (or writes to `solution.txt` or similar):
 
 ## Project Structure
 
-While your **Haskell** implementation may differ in file layout, below is how the Node.js reference solution is organized. You can mirror a similar pattern for Haskell modules:
-
 ```
 project-root/
 ├─ compile.sh              # Your Haskell compile script or Stack commands
