@@ -11,12 +11,6 @@ const { Airplane } = require('./airplane');
  */
 function scheduleDeliveries(unassignedPackages, airplanes, currentSolutionTotal, optimalSolution) {
 	optimalSolution.totalNodesExplored++;
-
-	// Prune if this branch can't be better than the current best solution
-	if (currentSolutionTotal > optimalSolution.optimalMinDistance) {
-		return optimalSolution;
-	}
-
 	// Base case - all packages assigned
 	if (unassignedPackages.length === 0) {
 		optimalSolution.validSolutionsCount++;
@@ -26,6 +20,12 @@ function scheduleDeliveries(unassignedPackages, airplanes, currentSolutionTotal,
 		}
 		return optimalSolution;
 	}
+
+	// Prune if this branch can't be better than the current best solution
+	if (currentSolutionTotal > optimalSolution.optimalMinDistance) {
+		return optimalSolution;
+	}
+
 
 	// Select next package by earliest deadline
 	const nextPackage = selectNextPackage(unassignedPackages);
