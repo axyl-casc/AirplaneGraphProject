@@ -59,10 +59,9 @@ function printSolution(optimalDeliverySchedule, airportNetwork, numOfPackages) {
 		`Total Distance for optimal solution: ${optimalDeliverySchedule.optimalMinDistance} km`,
 	);
 	report.push('');
-	report.push('============');
+	report.push('====================');
 	report.push('Airplane Assignments');
-	report.push('============');
-	report.push('');
+	report.push('====================');
 
 
 	// Each Airplane's Details
@@ -70,6 +69,11 @@ function printSolution(optimalDeliverySchedule, airportNetwork, numOfPackages) {
 		report.push(`--- AIRPLANE ${index} ---`);
 		report.push(`Total Load: ${airplane.currentLoad} kg `);
 		report.push(`Total Distance Traveled: ${airplane.totalDistance} km`);
+		// this plane was not used so just print the load and distance travelled
+		if(airplane.packages.length === 0) {
+			console.log(report.join('\n'));
+			return;
+		}
 		report.push(`Departure Time: ${formatTime(airplane.departureTimeOrigin)} (HH:MM)`);
 		report.push('');
 		report.push('ROUTE DETAILS:');

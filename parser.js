@@ -164,8 +164,9 @@ function verifyConstraintsStructure(constraintsData) {
  * The program will exit with an error message if the packageData does not match the expected structure.
  *
  * @param {object} packageData - The data to be verified as package data.
+ * @param {Number} numberOfDestinations - The total number of destinations, should be same size as the distance matrix
  */
-function verifyPackageStructure(packageData) {
+function verifyPackageStructure(packageData, numberOfDestinations) {
 	const BASE_ERROR_MSG = 'Error parsing package data file: ';
 
 	try {
@@ -187,7 +188,7 @@ function verifyPackageStructure(packageData) {
 				printErrorAndExit(
 					BASE_ERROR_MSG +
 						`Incorrect number of keys. Package data object must contain exactly ${expectedKeys.length} keys\n` +
-						"Expected keys are: 'id', 'weight','arrivalTime' and 'destination' .",
+						"Expected keys are: 'id', 'weight','arrivalTime', 'deadlineTime' and 'destination' .",
 				);
 			}
 
@@ -209,10 +210,10 @@ function verifyPackageStructure(packageData) {
 				);
 			}
 
-			if (!Number.isInteger(row.destination) || row.destination < 1) {
+			if (!Number.isInteger(row.destination) || row.destination < 1 || row.destination >= numberOfDestinations ) {
 				printErrorAndExit(
 					BASE_ERROR_MSG +
-						'destination is in invalid format. Must be an integer and greater than 0',
+						'destination is in invalid format. Must be an integer, greater than 0 and less than the number of rows in the distance matrix',
 				);
 			}
 
@@ -262,7 +263,7 @@ function parseAndLoadInputFiles() {
 	const [distanceMatrix, packageData, constraintsData] = loadFiles();
 	verifyDistanceMatrixStructure(distanceMatrix);
 	verifyConstraintsStructure(constraintsData);
-	verifyPackageStructure(packageData);
+	verifyPackageStructure(packageData, distanceMatrix.length);
 	return [distanceMatrix, packageData, constraintsData];
 }
 
