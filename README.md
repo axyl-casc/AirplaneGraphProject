@@ -73,26 +73,53 @@ TEMOO Cargo is an expedited cargo delivery system that schedules cargo planes fr
 ---
 
 ## How to Compile and Run
-Although this repository is intended for a **Haskell** version of the scheduling tool, the example command references a **Node.js** workflow for illustrative purposes. Replace the `node` command with your Haskell build/run approach once you have a Haskell solution in place.
 
-1. **Compile the Haskell Code**  
-   ```bash
-   sh compile.sh
-   ```
+This project supports both **JavaScript (Node.js)** and **Haskell** implementations of the TEMOO Cargo scheduler. Below are instructions for compiling and running both versions.
+
+---
+
+### JavaScript (Node.js) Version
+
+1. **Install Node.js**  
+   Make sure you have Node.js installed. You can download it from [nodejs.org](https://nodejs.org/).
 
 2. **Run the Program**  
+   From the project root directory, run:
    ```bash
    node main.js distance_matrix.json package_data.json constraints.json
    ```
-   - In the Haskell version, replace the `node main.js` call with your compiled Haskell executable and the same arguments:  
-     ```bash
-     ./temoo_cargo distance_matrix.json package_data.json constraints.json
-     ```
 
-3. **Check Output**  
-   - If a valid solution is found, it prints scheduling details (plane assignments, route distances, time logs, etc.) to the console or a file (depending on your implementation).  
-   - If no solution is feasible under the given constraints, it will indicate that no route was found.
+3. **Output**  
+   - Outputs the optimal delivery schedule to the console.
+   - If no valid schedule exists under the given constraints, it reports the failure clearly.
 
+---
+
+### Haskell Version
+
+1. **Compile the Haskell Code**  
+   Use the provided `compile.sh` script or compile manually using GHC or Stack:
+   ```bash
+   sh compile.sh
+   ```
+   Or manually with:
+   ```bash
+   ghc Main.hs -o temoo_cargo
+   ```
+
+2. **Run the Program**  
+   Once compiled, execute the program with the same input files:
+   ```bash
+   ./temoo_cargo distance_matrix.json package_data.json constraints.json
+   ```
+
+3. **Output**  
+   - Displays scheduling information similar to the Node.js version.
+   - May print to the console or write to `solution.txt` depending on implementation.
+
+---
+
+Feel free to use either implementation depending on your workflow or platform. The input/output formats are identical to ensure consistency across both.
 ---
 
 ## Algorithm & Approach
