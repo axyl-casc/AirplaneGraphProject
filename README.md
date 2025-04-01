@@ -188,9 +188,7 @@ A successful run displays (or writes to `solution.txt` or similar):
 ## Project Structure
 
 ```
-Folder PATH listing
-Volume serial number is 7361-39E5
-H:.
+main
 |   .gitignore
 |   .prettierrc
 |   airplane.js
