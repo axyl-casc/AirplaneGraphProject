@@ -58,11 +58,11 @@ TEMOO Cargo is an expedited cargo delivery system that schedules cargo planes fr
 
    **Example of JSON input:**  
    ```json
-   [
-       [0, 100],
-       [100, 0]
-   ]
- ```
+      [
+          [0, 100],
+          [100, 0]
+      ]
+    ```
 
 2. **Package Data (e.g., `package_data.json`)**  
    - Array of JSON objects, each describing one package:  
@@ -74,11 +74,11 @@ TEMOO Cargo is an expedited cargo delivery system that schedules cargo planes fr
 
    **Example of JSON input:**  
    ```json
-   [
-       { "id": 1, "weight": 500, "arrivalTime": "08:00", "deadlineTime": "12:00", "destination": 1 },
-       { "id": 2, "weight": 500, "arrivalTime": "10:00", "deadlineTime": "12:00", "destination": 1 }
-   ]
-```
+      [
+          { "id": 1, "weight": 500, "arrivalTime": "08:00", "deadlineTime": "12:00", "destination": 1 },
+          { "id": 2, "weight": 500, "arrivalTime": "10:00", "deadlineTime": "12:00", "destination": 1 }
+      ]
+   ```
 
 3. **Constraints (e.g., constraints.json)**  
    - An object with plane and flight-related settings:  
