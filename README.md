@@ -62,6 +62,36 @@ TEMOO Cargo is an expedited cargo delivery system that schedules cargo planes fr
        [0, 100],
        [100, 0]
    ]
+ 
+
+2. **Package Data (e.g., `package_data.json`)**  
+   - Array of JSON objects, each describing one package:  
+     - `id`: Integer, unique package ID  
+     - `weight`: Integer, package weight  
+     - `arrivalTime`: String in "HH:MM" (24-hour) format, time package arrives at the hub  
+     - `deadlineTime`: String in "HH:MM" format, must be delivered by this time (within 24 hours)  
+     - `destination`: Integer, ID of the destination airport  
+
+   **Example of JSON input:**  
+   ```json
+   [
+       { "id": 1, "weight": 500, "arrivalTime": "08:00", "deadlineTime": "12:00", "destination": 1 },
+       { "id": 2, "weight": 500, "arrivalTime": "10:00", "deadlineTime": "12:00", "destination": 1 }
+   ]
+
+
+3. **Constraints (e.g., constraints.json)**  
+   - An object with plane and flight-related settings:  
+     - numOfPlanes: Integer, how many planes are available  
+     - weightCapacity: Integer, max cargo weight each plane can hold (kg)  
+     - speed: Integer, plane speed (km/h)
+   Example of JSON input:
+```json
+      {
+          "numOfPlanes": 2,
+          "weightCapacity": 500,
+          "speed": 700
+      }
 
 ---
 
