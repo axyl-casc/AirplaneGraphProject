@@ -103,7 +103,7 @@ This project supports both **JavaScript (Node.js)** and **Haskell** implementati
 
 ### JavaScript (Node.js) Version
 
-Make sure you are in /main/JavascriptSolution to compile/run the Javascript version of this program
+Make sure you are in the Javascript folder to compile/run the Javascript version of this program.
 
 1. **Install Node.js**  
    Make sure you have Node.js installed. You can download it from [nodejs.org](https://nodejs.org/).
@@ -128,7 +128,7 @@ sh runTest.sh
 
 ### Haskell Version
 
-Make sure you are in /main/HaskellSolution to compile/run the Javascript version of this program
+Make sure you are in Haskell folder to compile/run the Javascript version of this program.
 
 1. **Compile the Haskell Code**  
    If using `cabal`, run:
@@ -136,23 +136,16 @@ Make sure you are in /main/HaskellSolution to compile/run the Javascript version
    cabal clean
    cabal build
    ```
-   If using `compile.sh`, ensure it contains:
-   ```bash
-   ghc Main.hs -o temoo_cargo
-   ```
 
 2. **Run the Program**  
    Once compiled, execute the program with the same input files:
    ```bash
-   ./temoo_cargo distance_matrix.json package_data.json constraints.json
+   ./AirplaneGraphProject distance_matrix.json package_data.json constraints.json
    ```
 
 3. **Output**  
-   - Displays scheduling information similar to the Node.js version.  
-   - May print to the console or write to `solution.txt` depending on implementation.
----
+   - Displays scheduling information similar to the Node.js version in the console.  
 
-Feel free to use either implementation depending on your workflow or platform. The input/output formats are identical to ensure consistency across both.
 ---
 
 ## Algorithm & Approach
@@ -225,20 +218,6 @@ main
             parser.test.js
        
 ```
-
----
-
-## Contributing
-1. **Fork** this repository.  
-2. **Create** a feature branch.  
-3. **Commit** changes with meaningful messages.  
-4. **Open** a Pull Request describing your modifications or additions.  
-
-We welcome improvements to:
-- Algorithmic efficiency  
-- Additional constraint support (e.g., multi-hub)  
-- Testing and coverage  
-- Documentation clarity  
 
 ---
 
