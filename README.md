@@ -106,12 +106,17 @@ This project supports both **JavaScript (Node.js)** and **Haskell** implementati
 1. **Install Node.js**  
    Make sure you have Node.js installed. You can download it from [nodejs.org](https://nodejs.org/).
 
-2. **Run the Program**  (Example command line argument)
+2. **Run the Program**  (Example JSON files, below command doesn't actually run because the files don't exist)
    From the project root directory, run:
    ```bash
    node main.js distance_matrix.json package_data.json constraints.json
    ```
-All
+To run all test cases, run the script:
+```bash
+sh runTest.sh
+```
+**Note** Test Case 16, may take a while to finish. (upwards of 2 minutes depending on hardware).
+
 3. **Output**  
    - Outputs the optimal delivery schedule to the console.  
    - If no valid schedule exists under the given constraints, it reports the failure clearly.
