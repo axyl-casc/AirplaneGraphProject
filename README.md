@@ -90,7 +90,7 @@ This project supports both **JavaScript (Node.js)** and **Haskell** implementati
    ```
 
 3. **Output**  
-   - Outputs the optimal delivery schedule to the console.
+   - Outputs the optimal delivery schedule to the console.  
    - If no valid schedule exists under the given constraints, it reports the failure clearly.
 
 ---
@@ -98,11 +98,15 @@ This project supports both **JavaScript (Node.js)** and **Haskell** implementati
 ### Haskell Version
 
 1. **Compile the Haskell Code**  
+   If using `cabal`, run:
    ```bash
-cabal clean
-cabal build 
-```
-
+   cabal clean
+   cabal build
+   ```
+   If using `compile.sh`, ensure it contains:
+   ```bash
+   ghc Main.hs -o temoo_cargo
+   ```
 
 2. **Run the Program**  
    Once compiled, execute the program with the same input files:
@@ -111,9 +115,8 @@ cabal build
    ```
 
 3. **Output**  
-   - Displays scheduling information similar to the Node.js version.
+   - Displays scheduling information similar to the Node.js version.  
    - May print to the console or write to `solution.txt` depending on implementation.
-
 ---
 
 Feel free to use either implementation depending on your workflow or platform. The input/output formats are identical to ensure consistency across both.
