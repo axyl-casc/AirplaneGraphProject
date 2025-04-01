@@ -2,22 +2,6 @@
 
 Welcome to the TEMOO Cargo expedited shipping service simulator, implemented in JavaScript (Node.js). This tool computes efficient routing and scheduling for cargo deliveries from a central hub to various Canadian airports, constrained by aircraft capacity, deadlines, and travel times.
 
-## Project Structure (JavaScript Version)
-
-```
-Javascript/
-├── main.js                  # Entry point for the scheduler
-├── scheduler.js             # Core scheduling logic
-├── graph.js                 # Graph handling (shortest path, adjacency, etc.)
-├── parser.js                # Input validation and parsing
-├── utils.js                 # Helper functions (time conversion, etc.)
-├── testcases/
-│   ├── distance_matrix_01.json
-│   ├── package_data_01.json
-│   └── constraints_01.json
-├── runTest.sh               # Bash script to run all test cases
-└── README.md                # This file
-```
 
 ## How to Run
 

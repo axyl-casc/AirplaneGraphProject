@@ -182,49 +182,6 @@ A successful run displays (or writes to `solution.txt` or similar):
 
 ---
 
-## Project Structure
-
-```
-main
-|   .gitignore
-|   .prettierrc
-|   airplane.js
-|   airport_graph_builder.js
-|   eslint.config.mjs
-|   main.js
-|   package-lock.json
-|   package.js
-|   package.json
-|   parser.js
-|   pathFinder.js
-|   README.md
-|   runTest.sh
-|   structure.md
-|   
-+---sample_input_files
-|       sample_constraints.json
-|       sample_distance.json
-|       sample_package.json
-|       
-\---tests
-    |   tests.md
-    |   
-    +---integration_tests
-    |   (various test cases, with corresponding contraint, distance matrix, and package data are here)
-    |           
-    \---unit_tests
-            airplane.test.js
-            airport_graph_builder.test.js
-            parser.test.js
-       
-```
-
----
-
-## License
-This project is distributed under the MIT License. Feel free to use, modify, and distribute it in your own projects, keeping the above license intact.
-
----
 
 **Thank you for using TEMOO Cargo’s Haskell-based shipping simulator!** If you have any questions or feature requests, please open an issue. Enjoy building and optimizing your cargo delivery schedules!
 
