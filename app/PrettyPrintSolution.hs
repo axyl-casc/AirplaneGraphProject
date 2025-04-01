@@ -1,9 +1,10 @@
-{-|
-Module      : PrettyPrintSolution
+{-# LANGUAGE BlockArguments #-}
 
-This module provides functions for pretty-printing the final delivery plan,
-including airplane assignments, route details, and package deliveries.
--}
+-- |
+-- Module      : PrettyPrintSolution
+--
+-- This module provides functions for pretty-printing the final delivery plan,
+-- including airplane assignments, route details, and package deliveries.
 module PrettyPrintSolution
   ( prettyPrintSolution,
   )
@@ -13,186 +14,154 @@ import AirplaneType
 import AirportGraph
 import Data.Maybe (fromMaybe)
 import PackageType
+  ( PackageData,
+    getDeadlineTimeOfPackage,
+    getDestinationOfPackage,
+    getIdOfPackage,
+    getWeightOfPackage,
+  )
 import Solver
+import Control.Monad (unless)
 
-{-|
-  Prints the final delivery plan and airplane assignments.
-
-  @prettyPrintSolution sol airports@ takes the following parameters:
-
-  * @Solution@ - The final solution with details about airplanes, packages, and routes.
-  * @[Airport]@ - A list of available airports to identify locations and connections.
-
-  === Output
-  - Prints information about:
-    - Number of valid solutions and nodes explored.
-    - Total distance for the optimal solution.
-    - Details of each airplane’s route and package deliveries.
--}
+-- |
+--  Prints the final delivery plan and assignments.
+--
+--  @param Solution@ Solution with airplane and package assignments
+--  @param [Airport]@ Airports for location information
+--
+--  @return IO ()@ No return value, prints to console
 prettyPrintSolution :: Solution -> [Airport] -> IO ()
 prettyPrintSolution sol airports = do
-  putStrLn "=== FINAL DELIVERY PLAN ==="
+  putStrLn "=== DELIVERY SOLUTION ==="
   putStrLn $ "Number of Valid solutions: " ++ show (validCount sol)
   putStrLn $ "Number of Nodes Explored: " ++ show (nodesExplored sol)
-  putStrLn $ "Total Distance for the Optimal Solution: " ++ show (bestDistance sol) ++ " km \n"
+  if validCount sol == 0 then putStrLn $ "No Solution Found"
+  else do
+    putStrLn $ "Total Distance for the Optimal Solution: " ++ show (bestDistance sol) ++ " km \n"
+    putStrLn "==========================="
+    putStrLn "Airplane Assignments"
+    putStrLn "==========================="
 
-  putStrLn "==========================="
-  putStrLn "Airplane Assignments"
-  putStrLn "==========================="
+    -- Print details for each airplane with index
+    mapM_ (printAirplaneWithIndex airports) (zip [0 ..] (bestPlanes sol))
 
-  -- Print details for each airplane with index
-  mapM_ (printAirplaneWithIndex airports) (zip [0 ..] (bestPlanes sol))
-
-{-|
-  Prints details for each airplane, including total load, distance, and departure time.
-
-  @printAirplaneWithIndex airports (index, plane)@ takes the following parameters:
-
-  * @[Airport]@ - The list of available airports.
-  * @(Int, Airplane)@ - A tuple containing the index of the airplane and the airplane itself.
-
-  === Output
-  - Prints the airplane’s current load, distance traveled, and departure time.
-  - Displays route details for all packages assigned to the airplane.
-  - Returns to the origin if not already there.
--}
+-- |
+--  Prints details for an airplane including load, distance, and route.
+--
+--  @param [Airport]@ Available airports for connections
+--  @param (Int, Airplane)@ Airplane index and the airplane itself
+--
+--  @return IO ()@ No return value, prints to console
 printAirplaneWithIndex :: [Airport] -> (Int, Airplane) -> IO ()
 printAirplaneWithIndex airports (index, plane) = do
   putStrLn $ "~~~ AIRPLANE " ++ show index ++ " ~~~"
   putStrLn $ "Total Load: " ++ show (getCurrentLoad plane) ++ " kg"
   putStrLn $ "Total Distance Traveled: " ++ show (getDistanceTraveled plane) ++ " km"
-  putStrLn $ "Departure Time: " ++ minutesToTimeStamp (getDepartureTimeFromOrigin plane) ++ "HH:MM\n"
 
-  putStrLn "Route Details:"
-  
-  -- Initialize origin and departure time
-  let initialTime = getDepartureTimeFromOrigin plane
-  let originAirport = 0 -- Start from the origin
+  unless (null (getPackages plane)) do
+    putStrLn $ "Departure Time: " ++ minutesToTimeStamp (getDepartureTimeFromOrigin plane) ++ "(HH:MM)"
+    putStrLn "Route Details:\n"
+    -- Initialize origin and departure time
+    let initialTime = getDepartureTimeFromOrigin plane
+    let originAirport = 0 -- Start from the origin
 
-  -- Print route details and return state after delivery
-  (finalAirport, finalTime) <- printRouteDetailsForPackages airports plane (getPackages plane) originAirport initialTime 1
-
-  -- Check if return trip to origin is needed
-  if finalAirport /= originAirport then do
+    -- Print route details and return state after delivery
+    (finalAirport, finalTime) <- printRouteDetailsForPackages airports plane (getPackages plane) originAirport initialTime 1
     let returnDistance = fromMaybe 0 (getDistanceTo (fromMaybe (head airports) (findAirportById airports finalAirport)) originAirport)
-    let returnTimeMinutes = if returnDistance > 0
-                             then floor ((fromIntegral returnDistance :: Double) / (fromIntegral (getSpeed plane) :: Double) * 60)
-                             else 0
+    let returnTimeMinutes = floor ((fromIntegral returnDistance :: Double) / (fromIntegral (getSpeed plane) :: Double) * 60)
     let returnArrivalTime = finalTime + returnTimeMinutes
-
-    putStrLn $ "  Return Trip: Airport " ++ show finalAirport ++ " → Airport " ++ show originAirport
+    putStrLn $ "  Return To Origin: Airport " ++ intListToArrowString (getPathTo (airports !! finalAirport) 0) 
     putStrLn $ "    Distance: " ++ show returnDistance ++ " km"
-    putStrLn $ "    Travel Time: " ++ minutesToTimeStamp returnTimeMinutes ++ "HH:MM"
-    putStrLn $ "    Arrival Time at Origin: " ++ minutesToTimeStamp returnArrivalTime ++ "HH:MM"
-  else
-    putStrLn $ "  Already at Origin (Airport " ++ show originAirport ++ ")"
-  putStrLn ""
+    putStrLn $ "    Travel Time: " ++ minutesToTimeStamp returnTimeMinutes ++ "(HH:MM)"
+    putStrLn $ "    Arrival Time at Origin: " ++ minutesToTimeStamp returnArrivalTime ++ "(HH:MM)"
+    putStrLn ""
 
-{-|
-  Prints route details for delivering a package and returns updated state.
-
-  @printRouteDetails airports package plane currentAirport currentTime legNumber@ takes the following parameters:
-
-  * @[Airport]@ - List of airports to search for connections.
-  * @PackageData@ - The package being delivered.
-  * @Airplane@ - The airplane carrying the package.
-  * @Int@ - The current airport where the airplane is located.
-  * @Int@ - The current time (in minutes since departure).
-  * @Int@ - The leg number of the delivery.
-
-  === Return Value
-  - @(Int, Int)@ - A tuple containing the new airport location and updated time.
-
-  === Output
-  - Prints delivery details including distance, travel time, and arrival time.
--}
+-- |
+--  Prints route details for a package delivery.
+--
+--  @param [Airport]@ Available airports
+--  @param PackageData@ Package being delivered
+--  @param Airplane@ Airplane carrying the package
+--  @param Int@ Current airport location
+--  @param Int@ Current time in minutes
+--  @param Int@ Leg number in the route
+--
+--  @return IO (Int, Int)@ Prints to the console and returns new airport location and updated time
 printRouteDetails :: [Airport] -> PackageData -> Airplane -> Int -> Int -> Int -> IO (Int, Int)
-printRouteDetails airports package plane currentAirport currentTime legNumber = do
+printRouteDetails airports package plane currentAirportID currentTime legNumber = do
   let destination = getDestinationOfPackage package
   let weight = getWeightOfPackage package
   let deadlineTime = getDeadlineTimeOfPackage package
   let packageId = getIdOfPackage package
+  let path = getPathTo (airports !! currentAirportID) destination
+  let distance = fromMaybe 0 $ getDistanceTo (airports !! currentAirportID) destination
+  let travelTimeMinutes =
+        if distance > 0
+          then round ((fromIntegral distance :: Double) / (fromIntegral (getSpeed plane) :: Double) * 60)
+          else 0
+  let arrivalTime = currentTime + travelTimeMinutes
 
-  if currentAirport == destination then do
-    putStrLn $ "  Leg " ++ show legNumber ++ ": Delivering Package " ++ show packageId
-    putStrLn $ "    Already at destination (Airport " ++ show destination ++ ")"
-    putStrLn $ "    Arrival Time: " ++ minutesToTimeStamp currentTime
-    putStrLn $ "    Package Weight: " ++ show weight ++ " kg"
-    putStrLn $ "    Deadline: " ++ minutesToTimeStamp deadlineTime
-    return (destination, currentTime)
-  else do
-    let currentAirportObj = fromMaybe (head airports) (findAirportById airports currentAirport)
-    let path = getPathTo currentAirportObj destination
-    let distance = fromMaybe 0 (getDistanceTo currentAirportObj destination)
-    let travelTimeMinutes = if distance > 0
-                             then floor ((fromIntegral distance :: Double) / (fromIntegral (getSpeed plane) :: Double) * 60)
-                             else 0
-    let arrivalTime = currentTime + travelTimeMinutes
+  putStrLn $ "Leg " ++ show legNumber ++ ": " ++ intListToArrowString path
+  putStrLn $ "    Distance: " ++ show distance ++ " km"
+  putStrLn $ "    Travel Time: " ++ minutesToTimeStamp travelTimeMinutes ++ " (HH:MM)"
+  putStrLn $ "    Arrival Time: " ++ minutesToTimeStamp arrivalTime ++ " (HH:MM)"
+  putStrLn $ "    Delivering Package " ++ show packageId ++ " (" ++ show weight ++ " kg)"
+  putStrLn $ "    Deadline " ++ minutesToTimeStamp deadlineTime ++ " (HH:MM)"
 
-    putStrLn $ "  Leg " ++ show legNumber ++ ": " ++ show currentAirport ++ " -> " ++ show destination
-    putStrLn $ "    Distance: " ++ show distance ++ " km"
-    putStrLn $ "    Travel Time: " ++ minutesToTimeStamp travelTimeMinutes
-    putStrLn $ "    Departure: " ++ minutesToTimeStamp currentTime
-    putStrLn $ "    Arrival: " ++ minutesToTimeStamp arrivalTime
-    putStrLn $ "    Delivering Package " ++ show packageId ++ " (" ++ show weight ++ " kg)"
-    putStrLn $ "    Deadline: " ++ minutesToTimeStamp deadlineTime
+  return (destination, arrivalTime)
 
-    return (destination, arrivalTime)
-
-{-|
-  Prints route details for all packages assigned to an airplane.
-
-  @printRouteDetailsForPackages airports plane packages currentAirport currentTime legNumber@ takes the following parameters:
-
-  * @[Airport]@ - List of airports for connection lookup.
-  * @Airplane@ - The airplane transporting packages.
-  * @[PackageData]@ - A list of packages to be delivered.
-  * @Int@ - The current airport location.
-  * @Int@ - The current time in minutes.
-  * @Int@ - The current leg number.
-
-  === Return Value
-  - @(Int, Int)@ - The final airport and arrival time after all packages are delivered.
-
-  === Output
-  - Prints package delivery details for each leg.
--}
+-- |
+--  Prints route details for all packages assigned to an airplane.
+--  Returns final location and time after all deliveries.
+--
+--  @param [Airport]@ Available airports
+--  @param Airplane@ Airplane transporting packages
+--  @param [PackageData]@ Packages to be delivered
+--  @param Int@ Current airport location
+--  @param Int@ Current time in minutes
+--  @param Int@ Starting leg number
+--
+--  @return IO (Int, Int)@ Final airport and arrival time
 printRouteDetailsForPackages :: [Airport] -> Airplane -> [PackageData] -> Int -> Int -> Int -> IO (Int, Int)
-printRouteDetailsForPackages _ _ [] currentAirport currentTime _ = 
+printRouteDetailsForPackages _ _ [] currentAirport currentTime _ =
   return (currentAirport, currentTime)
 printRouteDetailsForPackages airports plane (package : remainingPackages) currentAirport currentTime legNumber = do
   (newAirport, newTime) <- printRouteDetails airports package plane currentAirport currentTime legNumber
   printRouteDetailsForPackages airports plane remainingPackages newAirport newTime (legNumber + 1)
 
-{-|
-  Finds an airport by its ID from a list of airports.
-
-  @findAirportById airports searchId@ takes the following parameters:
-
-  * @[Airport]@ - List of available airports.
-  * @Int@ - The ID of the airport to search for.
-
-  === Return Value
-  - @Maybe Airport@ - Returns the airport if found, otherwise `Nothing`.
--}
+-- |
+--  Finds an airport by its ID in a list of airports.
+--
+--  @param [Airport]@ Available airports
+--  @param Int@ ID to search for
+--
+--  @return Maybe Airport@ The airport if found, Nothing otherwise
 findAirportById :: [Airport] -> Int -> Maybe Airport
 findAirportById [] _ = Nothing
 findAirportById (a : as) searchId
-  | (getAirportID a) == searchId = Just a
+  | getAirportID a == searchId = Just a
   | otherwise = findAirportById as searchId
 
-{-|
-  Converts minutes to a timestamp format (HH:MM).
-
-  @minutesToTimeStamp minutes@ takes the following parameter:
-
-  * @Int@ - The total number of minutes.
-
-  === Return Value
-  - @String@ - A formatted time string (HH:MM).
--}
+-- |
+--  Converts minutes to a timestamp format (HH:MM).
+--
+--  @param Int@ Total minutes
+--
+--  @return String@ Formatted time string
 minutesToTimeStamp :: Int -> String
 minutesToTimeStamp minutes =
   let hours = minutes `div` 60
       mins = minutes `mod` 60
    in (if hours < 10 then "0" else "") ++ show hours ++ ":" ++ (if mins < 10 then "0" else "") ++ show mins
+
+-- |
+--  Converts a list of integers to an arrow-separated string.
+--  Example: [1,2,3] becomes "1 -> 2 -> 3"
+--
+--  @param [Int]@ List to convert
+--
+--  @return String@ Formatted string
+intListToArrowString :: [Int] -> String
+intListToArrowString [] = ""
+intListToArrowString [x] = show x
+intListToArrowString (x : xs) = show x ++ " -> " ++ intListToArrowString xs

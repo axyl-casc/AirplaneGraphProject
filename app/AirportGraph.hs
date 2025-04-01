@@ -123,6 +123,8 @@ getPathTo (AirportInternal {connections = cons, airportID = sourceId}) destinati
   | sourceId == destinationId = [destinationId]
   | otherwise = maybe [] path (Map.lookup destinationId cons)
   
+
+
 {-|
   Retrieves the unique identifier (ID) of an airport.
   === Parameters

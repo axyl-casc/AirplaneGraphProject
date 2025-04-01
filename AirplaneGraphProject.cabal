@@ -62,7 +62,7 @@ library
                    Solver,
                    PrettyPrintSolution
   hs-source-dirs: app
-  build-depends: base ^>=4.17.2.1,
+  build-depends: base,
                  aeson,
                  lens-aeson,
                  bytestring >= 0.11.5.3,
@@ -75,7 +75,7 @@ library
 executable AirplaneGraphProject
   import: warnings
   main-is: Main.hs
-  build-depends: base ^>=4.17.2.1,
+  build-depends: base,
                  aeson,
                  lens-aeson,
                  bytestring >= 0.11.5.3,
@@ -91,7 +91,7 @@ executable AirplaneGraphProject
 executable AirplaneGraphProjectTests
   import: warnings
   main-is: AirportGraphTest.hs
-  build-depends: base ^>=4.17.2.1,
+  build-depends: base,
                  aeson,
                  lens-aeson,
                  bytestring >= 0.11.5.3,
