@@ -122,6 +122,14 @@ getPathTo :: Airport -> Int -> [Int]
 getPathTo (AirportInternal {connections = cons, airportID = sourceId}) destinationId
   | sourceId == destinationId = [destinationId]
   | otherwise = maybe [] path (Map.lookup destinationId cons)
+  
+{-|
+  Retrieves the unique identifier (ID) of an airport.
+  === Parameters
+  * @Airport@ - The airport record from which to retrieve the ID.
 
+  === Return Value
+  - @Int@ - The unique identifier of the given airport.
+-}
 getAirportID :: Airport -> Int
 getAirportID = airportID

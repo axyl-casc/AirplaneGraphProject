@@ -145,7 +145,23 @@ tryAddPackage network pkg plane
           returnTimeToOrigin = updatedReturn,
           speed = getSpeed plane
         }
+{-|
+  Evaluates the feasibility of a delivery route given a list of packages and a network of airports.
 
+  @evaluateDeliveryRouteFeasibility@ takes the following parameters:
+
+  * [PackageData] - A list of packages to be delivered.
+  * [Airport] - The network of airports representing connections between locations.
+  * Int - The current time in minutes since the start of the delivery route.
+  * Int - The current location (airport index).
+  * Int - The airplane speed in distance units per hour.
+  * Double - The cumulative distance traveled so far.
+
+  === Return Value
+  - @Maybe Double@:
+    - Returns `Just currDist` if all packages are delivered on time and the airplane returns to the starting location.
+    - Returns `Nothing` if any package cannot be delivered before its deadline.
+-}
 evaluateDeliveryRouteFeasibility :: [PackageData] -> [Airport] -> Int -> Int -> Int -> Double -> Maybe Double
 evaluateDeliveryRouteFeasibility [] network _ currLoc _ currDist
   | currLoc == 0 = Just currDist
