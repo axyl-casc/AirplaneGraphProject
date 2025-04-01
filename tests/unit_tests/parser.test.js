@@ -351,11 +351,11 @@ describe('verifyPackageStructure', () => {
 
 	test('should accept a valid package data array', () => {
 		const testPackage = [
-			{ id: 1, weight: 100, arrivalTime: '00:34', destination: 2 },
-			{ id: 2, weight: 200, arrivalTime: '12:34', destination: 3 },
-			{ id: 3, weight: 150, arrivalTime: '11:34', destination: 2 },
-			{ id: 4, weight: 15990, arrivalTime: '11:34', destination: 2 },
-			{ id: 9, weight: 15990, arrivalTime: '11:24', destination: 99 },
+			{ id: 1, weight: 100, arrivalTime: '00:34', deadlineTime: '23:00', destination: 2 },
+			{ id: 2, weight: 200, arrivalTime: '12:34', deadlineTime: '23:00', destination: 3 },
+			{ id: 3, weight: 150, arrivalTime: '11:34', deadlineTime: '23:00', destination: 2 },
+			{ id: 4, weight: 15990, arrivalTime: '11:34', deadlineTime: '23:00', destination: 2 },
+			{ id: 9, weight: 15990, arrivalTime: '11:24', deadlineTime: '23:00', destination: 99 },
 		];
 		verifyPackageStructure(testPackage);
 		expect(process.exit).not.toHaveBeenCalled();
@@ -415,13 +415,14 @@ describe('verifyPackageStructure', () => {
 				id: 1,
 				weight: 100,
 				arrivalTime: '00:34',
+				deadlineTime: '23:00',
 				destination: 2,
 				random: 212121,
 			},
-			{ id: 2, weight: 200, arrivalTime: '12:34', destination: 3 },
-			{ id: 3, weight: 150, arrivalTime: '11:34', destination: 2 },
-			{ id: 4, weight: 999, arrivalTime: '11:22', destination: 2 },
-			{ id: 9, weight: 15990, arrivalTime: '11:24', destination: 2 },
+			{ id: 2, weight: 200, arrivalTime: '12:34', deadlineTime: '23:00', destination: 3 },
+			{ id: 3, weight: 150, arrivalTime: '11:34', deadlineTime: '23:00', destination: 2 },
+			{ id: 4, weight: 999, arrivalTime: '11:22', deadlineTime: '23:00', destination: 2 },
+			{ id: 9, weight: 15990, arrivalTime: '11:24', deadlineTime: '23:00', destination: 2 },
 		];
 		verifyPackageStructure(testPackage);
 		expect(process.exit).toHaveBeenCalledWith(-1);
