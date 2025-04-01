@@ -128,7 +128,7 @@ sh runTest.sh
 
 ### Haskell Version
 
-Make sure you are in Haskell folder to compile/run the Javascript version of this program.
+Make sure you are in Haskell folder to compile/run the Haskell version of this program.
 
 1. **Compile the Haskell Code**  
    If using `cabal`, run:
