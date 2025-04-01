@@ -138,10 +138,15 @@ Make sure you are in Haskell folder to compile/run the Javascript version of thi
    ```
 
 2. **Run the Program**  
-   Once compiled, execute the program with the same input files:
+   Once compiled, execute the program with the same input files: (example input files, below command doesn't run)
    ```bash
-   ./AirplaneGraphProject distance_matrix.json package_data.json constraints.json
+   cabal run AirplaneGraphProject -- distance_matrix.json package_data.json constraints.json
    ```
+
+To run all test cases, run the following bash script:
+```bash
+sh compileAndRun.sh
+```
 
 3. **Output**  
    - Displays scheduling information similar to the Node.js version in the console.  
@@ -170,7 +175,7 @@ Make sure you are in Haskell folder to compile/run the Javascript version of thi
 ---
 
 ## Output & Results
-A successful run displays (or writes to `solution.txt` or similar):
+A successful run displays
 
 - **Total Distance** of the best solution.  
 - **Number of Airplanes Used**.  
