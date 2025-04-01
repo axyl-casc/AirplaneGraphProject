@@ -55,6 +55,11 @@ TEMOO Cargo is an expedited cargo delivery system that schedules cargo planes fr
    - A 2D array where the entry at `[i][j]` is the distance from airport `i` to airport `j`.  
    - `-1` indicates no direct route between `i` and `j`.  
    - Must be a valid square matrix of non-negative integers (aside from `-1`).
+   Example of JSON input:
+      [
+      	[0, 100],
+      	[100, 0]
+      ]   
 
 2. **Package Data (e.g., `package_data.json`)**  
    - Array of JSON objects, each describing one package:  
@@ -62,14 +67,24 @@ TEMOO Cargo is an expedited cargo delivery system that schedules cargo planes fr
      - `weight`: Integer, package weight  
      - `arrivalTime`: String in "HH:MM" (24-hour) format, time package arrives at the hub  
      - `deadlineTime`: String in "HH:MM" format, must be delivered by this time (within 24 hours)  
-     - `destination`: Integer, ID of the destination airport  
+     - `destination`: Integer, ID of the destination airport
+   Example of JSON input:
+      [
+       { "id": 1, "weight": 500, "arrivalTime": "08:00", "deadlineTime": "12:00", "destination": 1 },
+          { "id": 2, "weight": 500, "arrivalTime": "10:00", "deadlineTime": "12:00", "destination": 1 }
+      ]
 
 3. **Constraints (e.g., `constraints.json`)**  
    - An object with plane and flight-related settings:  
      - `numOfPlanes`: Integer, how many planes are available  
      - `weightCapacity`: Integer, max cargo weight each plane can hold (kg)  
      - `speed`: Integer, plane speed (km/h)
-
+   Example of JSON input:
+      {
+      	"numOfPlanes": 2,
+      	"weightCapacity": 500,
+      	"speed": 700
+      }
 ---
 
 ## How to Compile and Run
@@ -83,12 +98,12 @@ This project supports both **JavaScript (Node.js)** and **Haskell** implementati
 1. **Install Node.js**  
    Make sure you have Node.js installed. You can download it from [nodejs.org](https://nodejs.org/).
 
-2. **Run the Program**  
+2. **Run the Program**  (Example command line argument)
    From the project root directory, run:
    ```bash
    node main.js distance_matrix.json package_data.json constraints.json
    ```
-
+All
 3. **Output**  
    - Outputs the optimal delivery schedule to the console.  
    - If no valid schedule exists under the given constraints, it reports the failure clearly.
