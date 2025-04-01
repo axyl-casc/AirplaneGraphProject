@@ -123,7 +123,5 @@ getPathTo (AirportInternal {connections = cons, airportID = sourceId}) destinati
   | sourceId == destinationId = [destinationId]
   | otherwise = maybe [] path (Map.lookup destinationId cons)
 
-
 getAirportID :: Airport -> Int
 getAirportID = airportID
-

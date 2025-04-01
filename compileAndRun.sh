@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Build the project
 echo "Building project..."
+cabal clean
 cabal build
 
 echo ""

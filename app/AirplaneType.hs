@@ -27,8 +27,7 @@ import PackageType
 -- | Represents an airplane used for package delivery.
 -- Contains information about the airplane's capacity, load, and current status.
 data Airplane = AirplaneInternal
-  { 
-    totalCapacity :: Int,
+  { totalCapacity :: Int,
     packages :: [PackageData],
     currentLoad :: Int,
     totalDistanceTraveled :: Double,
@@ -38,13 +37,11 @@ data Airplane = AirplaneInternal
   }
   deriving (Show)
 
-
 -- | Creates a new airplane with the specified capacity and speed.
 -- All other properties are initialized to default values.
 --
 -- @capacity@ Maximum weight capacity of the airplane
 -- @speed@ Speed of the airplane
---
 createAnAirplane :: Int -> Int -> Airplane
 createAnAirplane totalCp sp =
   AirplaneInternal
@@ -62,10 +59,8 @@ createAnAirplane totalCp sp =
 -- @capacity@ Weight capacity of each airplane
 -- @speed@ Speed of each airplane
 -- @numOfPlanes@ Number of airplanes to create
---
 createMultipleAirplanes :: Int -> Int -> Int -> [Airplane]
 createMultipleAirplanes totalCp sp numOfPlanes = replicate numOfPlanes (createAnAirplane totalCp sp)
-
 
 -- | Gets the total weight capacity of an airplane.
 --
@@ -116,8 +111,6 @@ getReturnTimeToOrigin = returnTimeToOrigin
 getDepartureTimeFromOrigin :: Airplane -> Int
 getDepartureTimeFromOrigin = departureTimeFromOrigin
 
-
-
 -- | Attempts to add a package to an airplane
 -- Returns Nothing if the package can't be added due to weight constraints
 -- or if no feasible delivery route can be found that meets all package deadlines.
@@ -127,7 +120,6 @@ getDepartureTimeFromOrigin = departureTimeFromOrigin
 -- @param network@ List of airports representing the transportation network
 -- @param pkg@ Package data to be added
 -- @param plane@ Airplane to add the package to
---
 tryAddPackage :: [Airport] -> PackageData -> Airplane -> Maybe Airplane
 tryAddPackage network pkg plane
   | getCurrentLoad plane + getWeightOfPackage pkg > getTotalCapacity plane = Nothing
@@ -137,8 +129,7 @@ tryAddPackage network pkg plane
     earliestDeparture = max (getArrivalTimeOfPackage pkg) (getDepartureTimeFromOrigin plane)
     positions = [0 .. length (getPackages plane)]
     evaluated = map (\pos -> (pos, evaluateDeliveryRouteFeasibility (insertAt pos pkg (getPackages plane)) network earliestDeparture 0 (getSpeed plane) 0)) positions
-    feasibleInsertions = [(pos, dist) | (pos, Just dist) <- evaluated]  -- remove all unfeasible positions
-
+    feasibleInsertions = [(pos, dist) | (pos, Just dist) <- evaluated] -- remove all unfeasible positions
     (bestPos, bestDist) = minimumBy (comparing snd) feasibleInsertions -- finds the position with the smallest distance
     updatedPackages = insertAt bestPos pkg (getPackages plane)
     updatedLoad = getCurrentLoad plane + getWeightOfPackage pkg
@@ -155,15 +146,13 @@ tryAddPackage network pkg plane
           speed = getSpeed plane
         }
 
-
-
 evaluateDeliveryRouteFeasibility :: [PackageData] -> [Airport] -> Int -> Int -> Int -> Double -> Maybe Double
 evaluateDeliveryRouteFeasibility [] network _ currLoc _ currDist
   | currLoc == 0 = Just currDist
   | otherwise = getDistanceTo (network !! currLoc) 0 >>= \x -> Just (fromIntegral x + currDist)
 evaluateDeliveryRouteFeasibility (p : pkgs) network currTime currLoc airplaneSpeed currDist = do
   distToNewDest <- lookupConnection currLoc (getDestinationOfPackage p) -- Returns a maybe so needs to be extracted
-  let travelTime = (fromIntegral distToNewDest  / fromIntegral airplaneSpeed :: Double) * 60  -- Need to explicitly infer the type so GHc does not give a warning
+  let travelTime = (fromIntegral distToNewDest / fromIntegral airplaneSpeed :: Double) * 60 -- Need to explicitly infer the type so GHc does not give a warning
   let arrivalTime = currTime + round travelTime
 
   if arrivalTime > getDeadlineTimeOfPackage p -- Check if deadline is met
@@ -179,16 +168,13 @@ evaluateDeliveryRouteFeasibility (p : pkgs) network currTime currLoc airplaneSpe
   where
     lookupConnection from to = getDistanceTo (network !! from) to
 
-
 -- | Helper function to insert a value at a specified position in a list.
 -- If the position exceeds the list length, the value is appended at the end.
 --
 -- @param n@ Position where the element should be inserted (0-based)
 -- @param x@ Value to insert
 -- @param list@ List to insert into
---
 insertAt :: Int -> a -> [a] -> [a]
 insertAt 0 x xs = x : xs
 insertAt n x (y : ys) = y : insertAt (n - 1) x ys
 insertAt _ x [] = [x]
-

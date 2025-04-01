@@ -14,16 +14,16 @@ import AirplaneType
 import AirportGraph
 import Control.Exception (SomeException, catch)
 import Control.Monad (unless)
-import Data.Aeson
-import Data.Aeson.Types
+import Data.Aeson ( FromJSON, decode, eitherDecode )
+import Data.Aeson.Types ()
 import qualified Data.ByteString.Lazy as BL
-import Data.List.Split
-import GHC.Generics
-import PackageType (PackageData, createANewPackage)
-import System.Environment
+import Data.List.Split ()
+import GHC.Generics ( Generic )
+import PackageType (PackageData)
+import System.Environment ( getArgs )
 import System.Exit (die)
-import Text.Read
-import Text.Regex.TDFA
+import Text.Read ()
+import Text.Regex.TDFA ()
 
 -- | Constraints for the package delivery system.
 -- Contains specifications for planes, weight capacity, and speed.
@@ -39,62 +39,10 @@ data Constraints = Constraints
 
 instance FromJSON Constraints
 
-instance ToJSON Constraints
-
--- | JSON parser instance for 'PackageData'.
--- Parses package information including ID, weight, arrival time, deadline, and destination.
-instance FromJSON PackageData where
-  parseJSON = withObject "Failed to Parse Package Data" $ \v -> do
-    pkgId <- v .: "id"
-    weight <- v .: "weight"
-    arrivalTime <- v .: "arrivalTime" >>= parseTimeField
-    deadlineTime <- v .: "deadlineTime" >>= parseTimeField
-    destination <- v .: "destination"
-    return $ createANewPackage pkgId weight arrivalTime deadlineTime destination
-
--- | Parse a time string in format "HH:MM" into minutes past midnight.
--- Validates time format and returns the result as minutes in a Parser context.
---
--- >>> parseTimeField "14:30"
--- Just 870
-parseTimeField :: String -> Parser Int
-parseTimeField timeStr = do
-  unless (isTimeFormat timeStr) $ fail "Invalid time format for either arrival or deadlineTime in package data"
-  case convertTimeOFDayToMinutes timeStr of
-    Just minutes -> return minutes
-    Nothing -> fail $ "Could not convert " ++ timeStr ++ " to minutes"
-
--- | Convert a time string in format "HH:MM" to minutes past midnight.
--- Hours can be greater than 24 (e.g., "36:30").
--- Returns Nothing if the format is invalid or parsing fails.
---
--- >>> convertTimeOFDayToMinutes "14:30"
--- Just 870
---
--- >>> convertTimeOFDayToMinutes "36:45"
--- Just 2205
-convertTimeOFDayToMinutes :: String -> Maybe Int
-convertTimeOFDayToMinutes timeStr =
-  case splitByDelim ":" timeStr of
-    [hourStr, minuteStr] -> do
-      hour <- readMaybe hourStr
-      minute <- readMaybe minuteStr
-      return (hour * 60 + minute)
-    _ -> Nothing
-
--- | Splits a string based on a delimiter.
---
--- @param delim@ The delimiter to split on
--- @param str@ The string to be split--
--- >>> splitByDelim ":" "14:30"
--- ["14","30"]
-splitByDelim :: String -> String -> [String]
-splitByDelim = splitOn
-
 -- | Parse packages data from a JSON file.
 -- Returns a list of PackageData objects or terminates with an error.
 --
--- @param filePath@ ath to the JSON file containing packages data
+-- @param filePath@ Path to the JSON file containing packages data
 parsePackageData :: String -> IO [PackageData]
 parsePackageData filePath = do
   fileContent <- getFileContent filePath
@@ -161,7 +109,7 @@ verifyDistanceMatrix matrix
   | isNotUndirected matrix = (False, "Graph is not undirected")
   | otherwise = (True, "")
   where
-    isNotUndirected matrix = any (\(i, j) -> matrix !! j !! i /= matrix !! i !! j) [(i, j) | i <- [0 .. length matrix - 1], j <- [0 .. length matrix - 1]]
+    isNotUndirected matrixData = any (\(i, j) -> matrixData !! j !! i /= matrixData !! i !! j) [(i, j) | i <- [0 .. length matrixData - 1], j <- [0 .. length matrixData - 1]]
 
 -- | Parse all input files required for the package delivery system.
 -- Takes command line arguments and returns a tuple containing:
@@ -189,11 +137,3 @@ parseInputFiles = do
       let airportGraph = buildAirportGraph distData
       let airplanes = createMultipleAirplanes (weightCapacity constrData) (speed constrData) (numOfPlanes constrData)
       return (airportGraph, pkgData, airplanes)
-
--- | Check if a string is in the expected time format HH:MM.
--- Hours can be any non-negative integer, minutes must be 00-59.
---
--- @param str@ string to check
--- Reference: got the Regex from Chat GPT
-isTimeFormat :: String -> Bool
-isTimeFormat str = (str :: String) =~ ("^([0-9]+):[0-5][0-9]$" :: String)
