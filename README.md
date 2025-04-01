@@ -188,18 +188,124 @@ A successful run displays (or writes to `solution.txt` or similar):
 ## Project Structure
 
 ```
-project-root/
-├─ compile.sh              # Your Haskell compile script or Stack commands
-├─ main.js                 # Main entry point (Node.js reference)
-├─ parser.js               # Input file parsing & validation
-├─ airport_graph_builder.js # Constructs airport network with shortest paths
-├─ package.js              # Data structure/class for packages
-├─ airplane.js             # Data structure/class for airplane & route feasibility
-├─ pathFinder.js           # Core scheduling algorithm
-├─ constraints.json        # Example constraints file
-├─ distance_matrix.json    # Example distance matrix file
-├─ package_data.json       # Example package data file
-└─ README.md               # This file (project documentation)
+Folder PATH listing
+Volume serial number is 7361-39E5
+H:.
+|   .gitignore
+|   .prettierrc
+|   airplane.js
+|   airport_graph_builder.js
+|   eslint.config.mjs
+|   main.js
+|   package-lock.json
+|   package.js
+|   package.json
+|   parser.js
+|   pathFinder.js
+|   README.md
+|   runTest.sh
+|   structure.md
+|   
++---sample_input_files
+|       sample_constraints.json
+|       sample_distance.json
+|       sample_package.json
+|       
+\---tests
+    |   tests.md
+    |   
+    +---integration_tests
+    |   +---1
+    |   |       1_constraints.json
+    |   |       1_dist.json
+    |   |       1_pkg.json
+    |   |       
+    |   +---10
+    |   |       10_constraints.json
+    |   |       10_dist.json
+    |   |       10_pkg.json
+    |   |       
+    |   +---11
+    |   |       11_constraints.json
+    |   |       11_dist.json
+    |   |       11_pkg.json
+    |   |       
+    |   +---12
+    |   |       12_constraints.json
+    |   |       12_dist.json
+    |   |       12_pkg.json
+    |   |       
+    |   +---13
+    |   |       13_constraints.json
+    |   |       13_dist.json
+    |   |       13_pkg.json
+    |   |       
+    |   +---14
+    |   |       14_constraints.json
+    |   |       14_dist.json
+    |   |       14_pkg.json
+    |   |       
+    |   +---15
+    |   |       15_constraints.json
+    |   |       15_dist.json
+    |   |       15_pkg.json
+    |   |       
+    |   +---16
+    |   |       16_constraints.json
+    |   |       16_dist.json
+    |   |       16_pkg.json
+    |   |       
+    |   +---17
+    |   |       17_constraints.json
+    |   |       17_dist.json
+    |   |       17_pkg.json
+    |   |       package_data.json
+    |   |       
+    |   +---2
+    |   |       2_constraints.json
+    |   |       2_dist.json
+    |   |       2_pkg.json
+    |   |       
+    |   +---3
+    |   |       3_constraints.json
+    |   |       3_dist.json
+    |   |       3_pkg.json
+    |   |       
+    |   +---4
+    |   |       4_constraints.json
+    |   |       4_dist.json
+    |   |       4_pkg.json
+    |   |       
+    |   +---5
+    |   |       5_constraints.json
+    |   |       5_dist.json
+    |   |       5_pkg.json
+    |   |       
+    |   +---6
+    |   |       6_constraints.json
+    |   |       6_dist.json
+    |   |       6_pkg.json
+    |   |       
+    |   +---7
+    |   |       7_constraints.json
+    |   |       7_dist.json
+    |   |       7_pkg.json
+    |   |       
+    |   +---8
+    |   |       8_constraints.json
+    |   |       8_dist.json
+    |   |       8_pkg.json
+    |   |       
+    |   \---9
+    |           9_constraints.json
+    |           9_dist.json
+    |           9_pkg.json
+    |           
+    \---unit_tests
+            airplane.test.js
+            airport_graph_builder.test.js
+            parser.test.js
+       
 ```
 
 ---
