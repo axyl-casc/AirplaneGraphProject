@@ -1,4 +1,4 @@
-# Programming Paradigms Project (Haskell Version)
+# Programming Paradigms Project
 
 Welcome to the **TEMOO Cargo** expedited shipping service simulator! This project demonstrates how to schedule and route cargo plane deliveries to various airports across Canada, subject to constraints such as weight capacity, flight distances, and package deadlines. Although this README references a Haskell implementation, the core concepts and input/output formats described here align closely with the approach used in the reference JavaScript/Node.js version.
 
