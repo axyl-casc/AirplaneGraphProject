@@ -1,4 +1,0 @@
-# AirplaneGraphProject
-Programming Paradigms Project
-
-

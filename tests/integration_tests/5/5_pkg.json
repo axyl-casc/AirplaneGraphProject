@@ -1,4 +1,0 @@
-[
-	{ "id": 1, "weight": 250, "arrivalTime": "08:00", "deadlineTime": "10:00", "destination": 1 },
-    { "id": 2, "weight": 250, "arrivalTime": "10:00", "deadlineTime": "12:00", "destination": 2 }
-]
