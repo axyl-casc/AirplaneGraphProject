@@ -98,14 +98,11 @@ This project supports both **JavaScript (Node.js)** and **Haskell** implementati
 ### Haskell Version
 
 1. **Compile the Haskell Code**  
-   Use the provided `compile.sh` script or compile manually using GHC or Stack:
    ```bash
-   sh compile.sh
-   ```
-   Or manually with:
-   ```bash
-   ghc Main.hs -o temoo_cargo
-   ```
+cabal clean
+cabal build 
+```
+
 
 2. **Run the Program**  
    Once compiled, execute the program with the same input files:
