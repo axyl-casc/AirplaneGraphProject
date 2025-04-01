@@ -15,10 +15,6 @@ The script automates the following tasks:
 ```
 Python/
 ├── generate_graphs.py         # Main Python script for test generation, execution, timing, and graphing
-├── testcases/                 # Auto-generated input files stored here
-│   ├── distance_matrix_X.json
-│   ├── package_data_X.json
-│   └── constraints_X.json
 └── README.md                  # This file
 ```
 
