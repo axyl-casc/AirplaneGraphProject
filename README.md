@@ -182,10 +182,6 @@ A successful run displays (or writes to `solution.txt` or similar):
 
 ---
 
-## License
-This project is distributed under the MIT License. Feel free to use, modify, and distribute it in your own projects, keeping the above license intact.
-
----
 
 **Thank you for using TEMOO Cargo’s Haskell-based shipping simulator!** If you have any questions or feature requests, please open an issue. Enjoy building and optimizing your cargo delivery schedules!
 
