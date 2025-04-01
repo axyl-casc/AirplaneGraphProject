@@ -103,6 +103,8 @@ This project supports both **JavaScript (Node.js)** and **Haskell** implementati
 
 ### JavaScript (Node.js) Version
 
+Make sure you are in /main/JavascriptSolution to compile/run the Javascript version of this program
+
 1. **Install Node.js**  
    Make sure you have Node.js installed. You can download it from [nodejs.org](https://nodejs.org/).
 
@@ -112,7 +114,7 @@ This project supports both **JavaScript (Node.js)** and **Haskell** implementati
    ```bash
    node main.js distance_matrix.json package_data.json constraints.json
    ```
-To run all test cases, run the script:
+To run all test cases, run the following bash script:
 ```bash
 sh runTest.sh
 ```
@@ -125,6 +127,8 @@ sh runTest.sh
 ---
 
 ### Haskell Version
+
+Make sure you are in /main/HaskellSolution to compile/run the Javascript version of this program
 
 1. **Compile the Haskell Code**  
    If using `cabal`, run:
