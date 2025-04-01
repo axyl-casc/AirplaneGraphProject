@@ -1,0 +1,9 @@
+[
+  {
+    "id": 1,
+    "weight": 500,
+    "arrivalTime": "22:00",
+    "deadlineTime": "22:00",
+    "destination": 5
+  }
+]
