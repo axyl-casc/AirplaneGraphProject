@@ -2,15 +2,15 @@ module Main where
 
 import AirportGraph
 
-testCasesForAirportGraphBuilder :: [([[Int]], [Airport] -> Bool)]
+testCasesForAirportNetworkBuilder :: [([[Int]], AirportNetwork -> Bool)]
 testCasesForAirportGraphBuilder =
   [ ( -- Test Case 1: Basic connectivity
       [ [0, 10, 5]
       , [10, 0, 2]
       , [5, 2, 0]
       ]
-    , \airports ->
-        length airports == 3
+    , \airportNetwork ->
+        Map.size airportNetwork  == 3
           && getDistanceTo (airports !! 0) 1 == Just 7
           && getDistanceTo (airports !! 0) 2 == Just 5
           && getPathTo (airports !! 0) 1 == [0, 2, 1]

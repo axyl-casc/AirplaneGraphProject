@@ -124,7 +124,7 @@ verifyDistanceMatrix matrix
 -- 1. Distance matrix JSON file
 -- 2. Package data JSON file
 -- 3. Constraints JSON file
-parseInputFiles :: IO ([Airport], [PackageData], [Airplane])
+parseInputFiles :: IO (AirportNetwork, [PackageData], [Airplane])
 parseInputFiles = do
   args <- getArgs
   if length args /= 3
@@ -134,6 +134,6 @@ parseInputFiles = do
       distData <- parseDistanceMatrix distFile
       pkgData <- parsePackageData packageFile
       constrData <- parseConstraints constrFile
-      let airportGraph = buildAirportGraph distData
+      let airportNetwork =  buildAirportNetwork distData
       let airplanes = createMultipleAirplanes (weightCapacity constrData) (speed constrData) (numOfPlanes constrData)
-      return (airportGraph, pkgData, airplanes)
+      return (airportNetwork, pkgData, airplanes)

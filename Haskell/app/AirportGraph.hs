@@ -3,20 +3,24 @@
 -- and retrieving distances and paths between airports.
 module AirportGraph
   ( -- * Data Types
+    AirportNetwork,
     Airport,
-
-    -- * Graph Construction
-    buildAirportGraph,
-
-    -- * Graph Operations
+    buildAirportNetwork,
     getDistanceTo,
     getPathTo,
-    getAirportID,
+    originAirPortID
+
   )
 where
 
 import Data.Map (Map)
 import qualified Data.Map as Map
+
+
+
+originAirPortID :: Int
+originAirPortID = 0
+type AirportNetwork = Map Int Airport
 
 -- | Represents an airport node in the transportation network.
 data Airport = AirportInternal
@@ -24,8 +28,11 @@ data Airport = AirportInternal
     airportID :: Int,
     -- | Map of connections to other airports
     connections :: Map Int PathInfo
-  }
-  deriving (Show)
+  } deriving (Show)
+
+
+
+
 
 -- | Contains information about paths between airports.
 data PathInfo = PathInfo
@@ -63,6 +70,21 @@ shortestPaths distanceMatrix = foldl update initialPaths [0 .. numNodes - 1]
             then (newDist, Just k)
             else (distIJ, viaIJ)
 
+
+-- | Builds an airport network from a distance matrix
+--
+-- @param distanceMatrix@ Matrix of distances between airports (-1 indicates no connection)
+--
+-- @return AirportNetwork@ Complete network with computed paths
+--
+buildAirportNetwork :: [[Int]] -> AirportNetwork
+buildAirportNetwork distanceMatrix =
+  Map.fromList $ map (\a -> (airportID a, a)) $ buildAirports distanceMatrix
+
+
+
+
+
 -- | Reconstruct the shortest path between two airports.
 -- Uses the output from the Floyd-Warshall algorithm to trace the path.
 --
@@ -78,14 +100,14 @@ pathReconstruct i j paths
       Nothing -> [i, j]
       Just k -> pathReconstruct i k paths ++ tail (pathReconstruct k j paths)
 
--- | Builds an airport network from a distance matrix.
+-- | Helper function to build airports from a distance matrix
 -- Computes shortest paths and creates Airport objects with connection information.
 --
 -- @distanceMatrix@ Matrix of distances between airports (-1 indicates no direct connection)
 --
 -- Returns a list of Airport objects representing the network.
-buildAirportGraph :: [[Int]] -> [Airport]
-buildAirportGraph distanceMatrix =
+buildAirports :: [[Int]] -> [Airport]
+buildAirports distanceMatrix =
   let pathsMatrix = shortestPaths distanceMatrix
       numNodes = length distanceMatrix
    in [ AirportInternal
@@ -102,36 +124,29 @@ buildAirportGraph distanceMatrix =
       ]
 
 -- | Gets the distance to a specific destination airport.
--- Returns Nothing if there is no path to the destination.
--- For paths to itself, returns Just 0.
 --
--- @param airport@ Source airport
+-- @param airportNetwork@ The network of airports
+-- @param sourceId@ Source airport ID
 -- @param destinationId@ Destination airport ID
-getDistanceTo :: Airport -> Int -> Maybe Int
-getDistanceTo (AirportInternal {connections = cons, airportID = sourceId}) destinationId
+--
+-- @return Maybe Int@ Distance if path exists, Nothing otherwise
+getDistanceTo :: AirportNetwork -> Int -> Int -> Maybe Int
+getDistanceTo airportNetwork sourceId destinationId
   | sourceId == destinationId = Just 0
-  | otherwise = fmap distance (Map.lookup destinationId cons)
+  | otherwise = Map.lookup sourceId airportNetwork >>= \airport -> 
+                Map.lookup destinationId (connections airport) >>= \pathInfo ->
+                return (distance pathInfo)
 
--- | Gets the path to a specific destination airport.
--- Returns an empty list if there is no path to the destination.
--- Returns a single-element list containing the airport ID if the source and destination are the same.
+-- | Gets the path to a specific destination airport from the source
 --
--- @param airport@ Source airport
+-- @param airportNetwork@ The network of airports
+-- @param sourceId@ Source airport ID
 -- @param destinationId@ Destination airport ID
-getPathTo :: Airport -> Int -> [Int]
-getPathTo (AirportInternal {connections = cons, airportID = sourceId}) destinationId
-  | sourceId == destinationId = [destinationId]
-  | otherwise = maybe [] path (Map.lookup destinationId cons)
-  
-
-
-{-|
-  Retrieves the unique identifier (ID) of an airport.
-  === Parameters
-  * @Airport@ - The airport record from which to retrieve the ID.
-
-  === Return Value
-  - @Int@ - The unique identifier of the given airport.
--}
-getAirportID :: Airport -> Int
-getAirportID = airportID
+--
+-- @return Maybe [Int]@ Path if it exists, Nothing otherwise
+getPathTo :: AirportNetwork -> Int -> Int -> Maybe [Int]
+getPathTo airportNetwork sourceId destinationId
+  | sourceId == destinationId = Just [destinationId]
+  | otherwise = Map.lookup sourceId airportNetwork >>= \airport -> 
+                Map.lookup destinationId (connections airport) >>= \pathInfo ->
+                return (path pathInfo)

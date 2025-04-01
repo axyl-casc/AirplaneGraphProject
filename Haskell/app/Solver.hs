@@ -16,6 +16,7 @@ import AirportGraph
 import Data.Function (on)
 import Data.List (delete, minimumBy)
 import PackageType
+import AirportGraph (AirportNetwork)
 
 {-|
   Represents the state of the best solution found so far during the search.
@@ -43,7 +44,7 @@ data Solution = Solution
   * @[Airplane]@ - List of available airplanes with their current state.
   * @Double@ - The total distance traveled so far by all airplanes.
   * @Solution@ - The best solution found so far.
-  * @[Airport]@ - List of available airports for path and distance calculations.
+  * @AirportNetwork@ - THe network of airports.
 
   === Base Case
   - When all packages are assigned, the current solution is evaluated.
@@ -55,7 +56,7 @@ data Solution = Solution
   === Try Package Assignment
   - Attempts to assign the next package to each airplane and explores possible solutions recursively.
 -}
-scheduleDeliveries :: [PackageData] -> [Airplane] -> Double -> Solution -> [Airport] -> Solution
+scheduleDeliveries :: [PackageData] -> [Airplane] -> Double -> Solution -> AirportNetwork -> Solution
 scheduleDeliveries [] airplanes distSoFar solution _ =
   -- Base case: all packages have been assigned
   if distSoFar < bestDistance solution
