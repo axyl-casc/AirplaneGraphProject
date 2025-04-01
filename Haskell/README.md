@@ -2,23 +2,6 @@
 
 Welcome to the TEMOO Cargo expedited shipping service simulator, implemented in **Haskell**. This tool determines optimal or near-optimal routes for delivering packages from a central hub airport to other Canadian destinations, respecting constraints such as aircraft capacity, package deadlines, and flight distance.
 
-## Project Structure (Haskell Version)
-
-```
-Haskell/
-├── AirplaneGraphProject.hs     # Main program entry point
-├── AirplaneType.hs             # Airplane data type and logic
-├── Graph.hs                    # Graph-related logic and shortest path computations
-├── PackageParser.hs            # JSON parsing and input validation
-├── Scheduler.hs                # Core scheduling algorithm
-├── Utils.hs                    # Utility functions (e.g., time conversions)
-├── testcases/
-│   ├── distance_matrix_01.json
-│   ├── package_data_01.json
-│   └── constraints_01.json
-├── solution.txt                # Optional output file
-└── README.md                   # This file
-```
 
 ## How to Build and Run
 
