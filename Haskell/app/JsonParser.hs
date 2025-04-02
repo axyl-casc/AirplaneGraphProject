@@ -9,7 +9,6 @@
 -- Module for parsing JSON input files related to package delivery system.
 -- This module provides functions to parse constraints, distance matrices, and package data.
 -- 
-
 module JsonParser
   ( parseConstraints,
     parseInputFiles,
@@ -17,7 +16,7 @@ module JsonParser
 where
 
 import AirplaneType
-import AirportGraph
+import AirportNetwork
 import Control.Exception (SomeException, catch)
 import Control.Monad (unless)
 import Data.Aeson (FromJSON, decode, eitherDecode)

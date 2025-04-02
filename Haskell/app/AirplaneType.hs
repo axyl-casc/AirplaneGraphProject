@@ -17,7 +17,7 @@ module AirplaneType
   )
 where
 
-import AirportGraph (AirportNetwork, originAirPortID, getDistanceTo)
+import AirportNetwork (AirportNetwork, originAirPortID, getDistanceTo)
 import Data.List (minimumBy)
 import Data.Ord (comparing)
 import PackageType

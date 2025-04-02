@@ -1,16 +1,14 @@
+-- These pragmas are need to handle the parsing with the Aeson Library
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
--- | Module for package data typee and related functions.
+-- |
+-- Module      : PackageType
+--
+-- Module for package data typee and related functions.
 module PackageType
-  ( -- * Data Type
-    PackageData,
-
-    -- * Constructor Functions
+  ( PackageData,
     createANewPackage,
-    deepCopyPackage,
-
-    -- * Getter Functions
     getIdOfPackage,
     getWeightOfPackage,
     getArrivalTimeOfPackage,
@@ -19,35 +17,39 @@ module PackageType
   )
 where
 
-import Control.Monad ( unless )
-import Data.Aeson ( FromJSON(parseJSON), (.:), withObject )
-import Data.Aeson.Types ( Parser )
-import Data.List.Split ( splitOn )
-import Text.Read ( readMaybe )
-import Text.Regex.TDFA ( (=~) )
+import Control.Monad (unless)
+import Data.Aeson (FromJSON (parseJSON), withObject, (.:))
+import Data.Aeson.Types (Parser)
+import Data.List.Split (splitOn)
+import Text.Read (readMaybe)
+import Text.Regex.TDFA ((=~))
 
--- | Represents a package to be delivered.
+-- |
+--  Represents a package to be delivered.
+--
+--  === Fields:
+--  * @pkgId@ - Unique identifier for the package
+--  * @arrivalTime@ - Time of arrival at depot in minutes
+--  * @deadLineTime@ - Deadline for delivery in minutes
+--  * @destination@ - Destination identifier
 data PackageData = PackageInternal
-  { -- | Unique identifier for the package
-    pkgId :: Int,
-    -- | Weight of the package
+  { pkgId :: Int,
     weight :: Int,
-    -- | Time of arrival at depot in minutes
     arrivalTime :: Int,
-    -- | Deadline for delivery in minutes
     deadlineTime :: Int,
-    -- | Destination identifier
     destination :: Int
   }
   deriving (Show, Eq)
 
 -- | Creates a new package with the specified properties.
 --
--- @pid@ Unique identifier for the package
--- @w@ Weight of the package
--- @aTime@ Time when package arrives/becomes available (in minutes)
--- @dTime@ Deadline by which package must be delivered (in minutes)
--- @dest@ Destination identifier for the package
+-- @Int@ Unique identifier for the package
+-- @Int@ Weight of the package
+-- @Int@ Time when package arrives/becomes available (in minutes)
+-- @Int@ Deadline by which package must be delivered (in minutes)
+-- @Int@ Destination identifier for the package
+--
+-- @return PackageData@ New package  with specifications from the parameters
 createANewPackage :: Int -> Int -> Int -> Int -> Int -> PackageData
 createANewPackage pid w aTime dTime dest =
   PackageInternal
@@ -58,10 +60,9 @@ createANewPackage pid w aTime dTime dest =
       destination = dest
     }
 
--- | Creates a deep copy of a package.
--- This is used for creating a deep copy of an existing package
-deepCopyPackage :: PackageData -> PackageData
-deepCopyPackage = id
+---------------------
+-- Getter Functions
+---------------------
 
 -- | Gets the unique identifier of the package.
 getIdOfPackage :: PackageData -> Int
@@ -83,7 +84,8 @@ getDeadlineTimeOfPackage = deadlineTime
 getDestinationOfPackage :: PackageData -> Int
 getDestinationOfPackage = destination
 
--- | JSON parser instance for 'PackageData'.
+-- | JSON parser instance for 'PackageData'. Used by the "decode" function from the Aeson library to convert
+--   the json object to haskell instance
 -- Parses package information including ID, weight, arrival time, deadline, and destination.
 instance FromJSON PackageData where
   parseJSON = withObject "Failed to Parse Package Data" $ \v -> do
@@ -94,11 +96,11 @@ instance FromJSON PackageData where
     packageDestination <- v .: "destination"
     return $ createANewPackage packageId packageWeight packageArrivalTime packageDeadlineTime packageDestination
 
--- | Parse a time string in format "HH:MM" into minutes past midnight.
--- Validates time format and returns the result as minutes in a Parser context.
+-- | Parse a time string in format "HH:MM" into minutes.
+-- Validates time format and returns the result as minutes in a Parser context as needed by "FromJSON PackageData"
+-- @String@ string to Parse
 --
--- >>> parseTimeField "14:30"
--- Just 870
+-- @return Int@ string converted to minutes in int
 parseTimeField :: String -> Parser Int
 parseTimeField timeStr = do
   unless (isTimeFormat timeStr) $ fail "Invalid time format for either arrival or deadlineTime in package data"
@@ -109,7 +111,9 @@ parseTimeField timeStr = do
 -- | Check if a string is in the expected time format HH:MM.
 -- Hours can be any non-negative integer, minutes must be 00-59.
 --
--- @param str@ string to check
+-- @String@ string to check
+--
+-- @return Bool@ True if the string is the expected format otherwise false
 -- Reference: got the Regex from Chat GPT
 isTimeFormat :: String -> Bool
 isTimeFormat str = (str :: String) =~ ("^([0-9]+):[0-5][0-9]$" :: String)
@@ -118,11 +122,9 @@ isTimeFormat str = (str :: String) =~ ("^([0-9]+):[0-5][0-9]$" :: String)
 -- Hours can be greater than 24 (e.g., "36:30").
 -- Returns Nothing if the format is invalid or parsing fails.
 --
--- >>> convertTimeOFDayToMinutes "14:30"
--- Just 870
+-- @String@ The string to convert to minutes
 --
--- >>> convertTimeOFDayToMinutes "36:45"
--- Just 2205
+-- @return Maybe Int@ the string in minutes or nothing if format is invalid or parsing fails
 convertTimeOFDayToMinutes :: String -> Maybe Int
 convertTimeOFDayToMinutes timeStr =
   case splitByDelim ":" timeStr of
@@ -134,9 +136,9 @@ convertTimeOFDayToMinutes timeStr =
 
 -- | Splits a string based on a delimiter.
 --
--- @param delim@ The delimiter to split on
--- @param str@ The string to be split--
--- >>> splitByDelim ":" "14:30"
--- ["14","30"]
+-- @String@ The delimiter to split on
+-- @String@ The string to be split--
+--
+-- @return [string] list of string split based on the delimiter
 splitByDelim :: String -> String -> [String]
 splitByDelim = splitOn

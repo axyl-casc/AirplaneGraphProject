@@ -2,7 +2,7 @@
 -- Module      : AirportNetwork
 --
 -- Module for creating and managing airport network
-module AirportGraph
+module AirportNetwork
   ( AirportNetwork,
     Airport,
     buildAirportNetwork,

@@ -11,7 +11,7 @@ module Solver
 where
 
 import AirplaneType
-import AirportGraph (AirportNetwork)
+import AirportNetwork (AirportNetwork)
 import Data.Function (on)
 import Data.List (delete, minimumBy)
 import PackageType

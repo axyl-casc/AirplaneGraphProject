@@ -1,17 +1,17 @@
-{-# LANGUAGE BlockArguments #-}
+{-# LANGUAGE BlockArguments #-} -- makes nested do's cleaner
 
 -- |
 -- Module      : PrettyPrintSolution
 --
 -- This module provides functions for pretty-printing the final delivery plan,
--- including airplane assignments, route details, and package deliveries.
 module PrettyPrintSolution
   ( prettyPrintSolution,
   )
 where
 
 import AirplaneType
-import AirportGraph
+import AirportNetwork
+import Control.Monad (unless)
 import Data.Maybe (fromMaybe)
 import PackageType
   ( PackageData,
@@ -21,15 +21,12 @@ import PackageType
     getWeightOfPackage,
   )
 import Solver
-import Control.Monad (unless)
-import AirportGraph
-import AirportGraph (AirportNetwork, originAirPortID)
 
 -- |
 --  Prints the final delivery plan and assignments.
 --
---  @param Solution@ Solution with airplane and package assignments
---  @param AirportNetwork@ Network of Airports
+--  @Solution@ Solution with airplane and package assignments
+--  @AirportNetwork@ Network of Airports
 --
 --  @return IO ()@ No return value, prints to console
 prettyPrintSolution :: Solution -> AirportNetwork -> IO ()
@@ -37,18 +34,19 @@ prettyPrintSolution sol network = do
   putStrLn "=== DELIVERY SOLUTION ==="
   putStrLn $ "Number of Valid solutions: " ++ show (validCount sol)
   putStrLn $ "Number of Nodes Explored: " ++ show (nodesExplored sol)
-  if validCount sol == 0 then putStrLn $ "No Solution Found"
-  else do
-    putStrLn $ "Total Distance for the Optimal Solution: " ++ show (bestDistance sol) ++ " km \n"
-    putStrLn "==========================="
-    putStrLn "Airplane Assignments"
-    putStrLn "==========================="
+  if validCount sol == 0
+    then putStrLn $ "No Solution Found"
+    else do
+      putStrLn $ "Total Distance for the Optimal Solution: " ++ show (bestDistance sol) ++ " km \n"
+      putStrLn "==========================="
+      putStrLn "Airplane Assignments"
+      putStrLn "==========================="
 
-    -- Print details for each airplane with index
-    mapM_ (printAirplaneWithIndex network) (zip [0 ..] (bestPlanes sol))
+      -- Print details for each airplane with index
+      mapM_ (printAirplaneWithIndex network) (zip [0 ..] (bestPlanes sol))
 
 -- |
---  Prints details for an airplane including load, distance, and route.
+--  Prints details for an airplane including load, distance, and route(package delivery Order).
 --
 --  @param AirportNetwork@ Network of Airport
 --  @param (Int, Airplane)@ Airplane index and the airplane itself
@@ -71,7 +69,7 @@ printAirplaneWithIndex network (index, plane) = do
     let returnDistance = fromMaybe 0 (getDistanceTo network finalAirport originAirPortID)
     let returnTimeMinutes = floor ((fromIntegral returnDistance :: Double) / (fromIntegral (getSpeed plane) :: Double) * 60)
     let returnArrivalTime = finalTime + returnTimeMinutes
-    putStrLn $ "  Return To Origin: Airport " ++ intListToArrowString (fromMaybe [] (getPathTo network finalAirport originAirPortID)) 
+    putStrLn $ "  Return To Origin: Airport " ++ intListToArrowString (fromMaybe [] (getPathTo network finalAirport originAirPortID))
     putStrLn $ "    Distance: " ++ show returnDistance ++ " km"
     putStrLn $ "    Travel Time: " ++ minutesToTimeStamp returnTimeMinutes ++ "(HH:MM)"
     putStrLn $ "    Arrival Time at Origin: " ++ minutesToTimeStamp returnArrivalTime ++ "(HH:MM)"
@@ -95,7 +93,7 @@ printRouteDetails network package plane currentAirportID currentTime legNumber =
   let deadlineTime = getDeadlineTimeOfPackage package
   let packageId = getIdOfPackage package
   let path = fromMaybe [] $ getPathTo network currentAirportID destination
-  let distance = fromMaybe 0 $ getDistanceTo network  currentAirportID destination
+  let distance = fromMaybe 0 $ getDistanceTo network currentAirportID destination
   let travelTimeMinutes =
         if distance > 0
           then round ((fromIntegral distance :: Double) / (fromIntegral (getSpeed plane) :: Double) * 60)

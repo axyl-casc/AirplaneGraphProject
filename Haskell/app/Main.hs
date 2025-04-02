@@ -6,7 +6,6 @@ import Solver
 
 -- | The main entry point for the application. This function initializes the
 main :: IO ()
--- TO Do : figure out the package time problem
 main =
   do
     (airportGraph, pkgData, airplanes) <- parseInputFiles
