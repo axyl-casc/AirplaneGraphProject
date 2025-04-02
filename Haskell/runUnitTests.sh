@@ -2,6 +2,7 @@
 
 cabal clean
 cabal build
-cabal run AirplaneGraphProjectTests
+cabal run AirportNetworkTest
+
 
 $SHELL
