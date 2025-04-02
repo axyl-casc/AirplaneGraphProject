@@ -1,13 +1,11 @@
--- | Module for airplane type and related function
+-- |
+-- Module      : AirplaneType
+--
+-- module for airplane type and related function
 module AirplaneType
-  ( -- * Data Type
-    Airplane,
-
-    -- * Constructor Functions
+  ( Airplane,
     createAnAirplane,
     createMultipleAirplanes,
-
-    -- * Getter Functions
     getTotalCapacity,
     getSpeed,
     getCurrentLoad,
@@ -19,14 +17,20 @@ module AirplaneType
   )
 where
 
-import AirportGraph
+import AirportGraph (AirportNetwork, originAirPortID, getDistanceTo)
 import Data.List (minimumBy)
 import Data.Ord (comparing)
 import PackageType
-import AirportGraph (AirportNetwork, originAirPortID)
 
 -- | Represents an airplane used for package delivery.
 -- Contains information about the airplane's capacity, load, and current status.
+--  === Fields:
+--  * @totalCapacity@ - The total weight that the airplane can carry
+--  * @packages@ - The list of packages that the airplane is to deliver, the order of the list is the delivery order as well
+--  * @totalDistanceTraveled@ - Total distance that the airplane will travel to deliver the packages including the return trip
+--  * @returnTimeToOrigin@ - The time in minutes when the airplane returns to the Origin Airport(1)
+--  * @departureTimeFromOrigin@ - The time in minutes when the airplane departs from the Origin
+--  * @speed@ - Speed in Km/h of the airplane
 data Airplane = AirplaneInternal
   { totalCapacity :: Int,
     packages :: [PackageData],
@@ -41,8 +45,8 @@ data Airplane = AirplaneInternal
 -- | Creates a new airplane with the specified capacity and speed.
 -- All other properties are initialized to default values. (0 or [])
 --
--- @param totalCp@ Maximum weight capacity of the airplane
--- @param sp@ Speed of the airplane
+-- @ Int@ Maximum weight capacity of the airplane
+-- Int@ Speed of the airplane
 --
 -- @return Airplane@ A new airplane instance
 createAnAirplane :: Int -> Int -> Airplane
@@ -59,13 +63,17 @@ createAnAirplane totalCp sp =
 
 -- | Creates multiple airplane instances with the same capacity and speed.
 --
--- @param totalCp@ Weight capacity of each airplane
--- @param sp@ Speed of each airplane
--- @param numOfPlanes@ Number of airplanes to create
+-- @Int@ Weight capacity of each airplane
+-- @Int@ Speed of each airplane
+-- @Int@ Number of airplanes to create
 --
 -- @return [Airplane]@ List of identical airplanes
 createMultipleAirplanes :: Int -> Int -> Int -> [Airplane]
 createMultipleAirplanes totalCp sp numOfPlanes = replicate numOfPlanes (createAnAirplane totalCp sp)
+
+---------------------
+-- Getter Functions
+---------------------
 
 -- | Gets the total weight capacity of an airplane.
 getTotalCapacity :: Airplane -> Int
@@ -99,23 +107,24 @@ getDepartureTimeFromOrigin :: Airplane -> Int
 getDepartureTimeFromOrigin = departureTimeFromOrigin
 
 -- | Attempts to add a package to an airplane.
--- Returns Nothing if package exceeds weight limit or no feasible route exists.
+-- Returns Nothing if package exceeds weight limit or no feasible route exists (i,e: some packages cant' be delivered in time).
 -- If successful, package is added in optimal position to minimize distance.
 --
--- @param network@ List of airports representing the transportation network
--- @param pkg@ Package data to be added
--- @param plane@ Airplane to add the package to
+-- @AirportNetwork@ List of airports representing the transportation network
+-- @PackageData@ Package to be added
+-- @Plane@ Airplane to add the package to
 --
 -- @return Maybe Airplane@ Updated airplane or Nothing if not possible
 tryAddPackage :: AirportNetwork -> PackageData -> Airplane -> Maybe Airplane
 tryAddPackage network pkg plane
-  | getCurrentLoad plane + getWeightOfPackage pkg > getTotalCapacity plane = Nothing
-  | null feasibleInsertions = Nothing
-  | otherwise = Just updatedPlane
+  | getCurrentLoad plane + getWeightOfPackage pkg > getTotalCapacity plane = Nothing -- Basic wait check
+  | null feasibleInsertions = Nothing -- it was not feasible
+  | otherwise = Just updatedPlane -- it was feasible
   where
     earliestDeparture = max (getArrivalTimeOfPackage pkg) (getDepartureTimeFromOrigin plane)
     positions = [0 .. length (getPackages plane)]
-    evaluated = map (\pos -> (pos, evaluateDeliveryRouteFeasibility (insertAt pos pkg (getPackages plane)) network earliestDeparture 0 (getSpeed plane) 0)) positions
+    -- Map each possible insertion position to a tuple of (position, route feasibility evaluation)
+    evaluated = map (\pos -> (pos, evaluateDeliveryRouteFeasibility (insertAt pos pkg (getPackages plane)) network earliestDeparture originAirPortID (getSpeed plane) 0)) positions
     feasibleInsertions = [(pos, dist) | (pos, Just dist) <- evaluated] -- remove all unfeasible positions
     (bestPos, bestDist) = minimumBy (comparing snd) feasibleInsertions -- finds the position with the smallest distance
     updatedPackages = insertAt bestPos pkg (getPackages plane)
@@ -135,7 +144,7 @@ tryAddPackage network pkg plane
 
 -- |
 --  Evaluates the feasibility of a delivery route.
---  Checks if all packages can be delivered on time with return to origin.
+--  Checks if all packages can be delivered on time with return to origin. This is a helper function to tryAdd package so It should only be called by it.
 --
 --  @param [PackageData]@ List of packages to deliver
 --  @param AirportNetwork@ Network of airports
@@ -146,11 +155,11 @@ tryAddPackage network pkg plane
 --
 --  @return Maybe Double@ Total distance if feasible, Nothing otherwise
 evaluateDeliveryRouteFeasibility :: [PackageData] -> AirportNetwork -> Int -> Int -> Int -> Double -> Maybe Double
-evaluateDeliveryRouteFeasibility [] network _ currLoc _ currDist
+evaluateDeliveryRouteFeasibility [] network _ currLoc _ currDist -- Base case all packages have been delivered
   | currLoc == originAirPortID = Just currDist
-  | otherwise = getDistanceTo network currLoc originAirPortID >>= \x -> Just (fromIntegral x + currDist)
+  | otherwise = getDistanceTo network currLoc originAirPortID >>= \x -> Just (fromIntegral x + currDist) -- Add the distance from the last delivery location to origin
 evaluateDeliveryRouteFeasibility (p : pkgs) network currTime currLoc airplaneSpeed currDist = do
-  distToNewDest <- getDistanceTo network currLoc (getDestinationOfPackage p) -- Returns a maybe so needs to be extracted
+  distToNewDest <- getDistanceTo network currLoc (getDestinationOfPackage p) -- getDistanceTo returns a maybe, so "<-" allows shortcircuting to nothing in case
   let travelTime = (fromIntegral distToNewDest / fromIntegral airplaneSpeed :: Double) * 60 -- Need to explicitly infer the type so GHc does not give a warning
   let arrivalTime = currTime + round travelTime
 
@@ -168,9 +177,9 @@ evaluateDeliveryRouteFeasibility (p : pkgs) network currTime currLoc airplaneSpe
 -- | Helper function to insert a value at a specified position in a list.
 -- If the position exceeds the list length, the value is appended at the end.
 --
--- @param n@ Position where the element should be inserted (0-based)
--- @param x@ Value to insert
--- @param list@ List to insert into
+-- @Int@ Position where the element should be inserted (0-based)
+-- @a@ Value to insert
+-- @[a]@ List to insert into
 --
 -- @return [a]@ New list with the inserted element
 insertAt :: Int -> a -> [a] -> [a]

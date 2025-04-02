@@ -1,9 +1,15 @@
+-- These pragmas are need to handle the parsing with the Aeson Library
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
--- | Module for parsing JSON input files related to package delivery system.
+-- |
+-- Module      : JsonParser
+--
+-- Module for parsing JSON input files related to package delivery system.
 -- This module provides functions to parse constraints, distance matrices, and package data.
+-- 
+
 module JsonParser
   ( parseConstraints,
     parseInputFiles,
@@ -14,29 +20,38 @@ import AirplaneType
 import AirportGraph
 import Control.Exception (SomeException, catch)
 import Control.Monad (unless)
-import Data.Aeson ( FromJSON, decode, eitherDecode )
+import Data.Aeson (FromJSON, decode, eitherDecode)
 import Data.Aeson.Types ()
 import qualified Data.ByteString.Lazy as BL
 import Data.List.Split ()
-import GHC.Generics ( Generic )
+import GHC.Generics (Generic)
 import PackageType (PackageData)
-import System.Environment ( getArgs )
+import System.Environment (getArgs)
 import System.Exit (die)
 import Text.Read ()
 import Text.Regex.TDFA ()
 
 -- | Constraints for the package delivery system.
 -- Contains specifications for planes, weight capacity, and speed.
+
+
+
+-- |
+--  Represents constraints for the package delivery system.
+--
+--  === Fields:
+--  * @numOfPlanes@ - Number of delivery planes available
+--  * @weightCapacity@ - Maximum weight capacity per plane
+--  * @speed@ - Speed of the planes
 data Constraints = Constraints
-  { -- | Number of delivery planes available
+  { 
     numOfPlanes :: Int,
-    -- | Maximum weight capacity per plane
     weightCapacity :: Int,
-    -- | Speed of the planes
     speed :: Int
   }
   deriving (Show, Generic)
 
+-- Allows Aeson library to create a generic mapping from json to constraints.Used when "decode" function is used
 instance FromJSON Constraints
 
 -- | Parse packages data from a JSON file.
@@ -134,6 +149,6 @@ parseInputFiles = do
       distData <- parseDistanceMatrix distFile
       pkgData <- parsePackageData packageFile
       constrData <- parseConstraints constrFile
-      let airportNetwork =  buildAirportNetwork distData
+      let airportNetwork = buildAirportNetwork distData
       let airplanes = createMultipleAirplanes (weightCapacity constrData) (speed constrData) (numOfPlanes constrData)
       return (airportNetwork, pkgData, airplanes)
