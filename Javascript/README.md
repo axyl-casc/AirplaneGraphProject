@@ -1,48 +1,48 @@
-# TEMOO Cargo – JavaScript Version
+# TEEMO Cargo - JavaScript Version
 
-Welcome to the TEMOO Cargo expedited shipping service simulator, implemented in JavaScript (Node.js). This tool computes efficient routing and scheduling for cargo deliveries from a central hub to various Canadian airports, constrained by aircraft capacity, deadlines, and travel times.
+> Modern cargo optimization for efficient logistics
 
+This is the JavaScript implementation of the TEEMO Cargo optimization system, providing efficient route planning and package distribution.
 
-## How to Run
+## External Libraries
 
-1. Install Node.js  
-   Download and install Node.js from nodejs.org if it is not already installed.
+- **Jest** - Testing framework for unit Testing
 
-2. Navigate to the JavaScript directory:
+## Prerequisites
 
+- **Node.js**
+- **npm**
+
+## How to run
+
+1. Clone this repository
+2. Cd into this directory
+3. Install the dependencies:
    ```bash
-   cd Javascript
+   npm install
+   ```
+4. Run the application:
+   ```bash
+   node main <pathToDistanceMatrix> <pathToPkgData> <pathToConstraintsFile>
    ```
 
-3. Run the simulator with a set of input files:
+## Example Usage
 
-   ```bash
-   node main.js testcases/distance_matrix_01.json testcases/package_data_01.json testcases/constraints_01.json
-   ```
+```bash
+node main ./sample_input_files/sample_distance_matrix.json ./sample_input_files/data/sample_packages.json ./sample_input_files/data/sample_constraints.json
+```
 
-4. Run all test cases:
+## More Documentation
 
-   ```bash
-   sh runTest.sh
-   ```
+For detailed information about:
 
-   Note: Some test cases, such as test case 16, may take longer to complete depending on hardware performance.
+- Input/output formats
+- Algorithm implementation details
+- Performance benchmarks
+- Comparison with Haskell implementation
 
-## Input Format
+Please refer to the [general project README](../README.md).
 
-- **Distance Matrix (distance_matrix.json)**: 2D array representing distances between airports. A value of -1 indicates no direct route.
-- **Package Data (package_data.json)**: Array of packages, each with id, weight, arrival time, deadline time, and destination.
-- **Constraints (constraints.json)**: Includes number of planes, their weight capacity, and speed.
+## Testing
 
-## Output
-
-- Displays the optimal delivery schedule in the console.
-- If no feasible solution exists, the program clearly states this.
-
-## Notes
-
-- The scheduling algorithm uses a backtracking or branch-and-cut strategy.
-- Graph traversal relies on algorithms such as Floyd–Warshall or Dijkstra's.
-- Scheduling ensures packages meet deadlines and planes do not exceed capacity.
-
-Refer to the general project README for a broader overview and the Haskell implementation.
+Please refer to the [Testing Document](./tests.md)

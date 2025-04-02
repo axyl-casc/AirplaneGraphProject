@@ -3,7 +3,7 @@ const {
 	verifyDistanceMatrixStructure,
 	verifyConstraintsStructure,
 	verifyPackageStructure,
-} = require('../../parser.js'); // Adjust path if needed
+} = require('../parser.js'); // Adjust path if needed
 const fs = require('fs');
 
 // replace the standard fs module

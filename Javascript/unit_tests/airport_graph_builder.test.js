@@ -4,7 +4,7 @@ const {
 	shortestDistanceMatrix,
 	buildAirportNetwork,
 	Airport,
-} = require('../../airport_graph_builder.js');
+} = require('../airport_graph_builder.js');
 
 describe('Testing shortestDistanceMatrix function', () => {
 	test('should calculate shortest distances for a simple graph 3 x 3 graph with no intermediate Nodes(all shortest paths are direct edges)', () => {

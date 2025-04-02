@@ -1,6 +1,6 @@
-const { Airplane } = require('../../airplane.js');
-const { TemooPackage } = require('../../package.js');
-const { buildAirportNetwork } = require('../../airport_graph_builder.js'); // Assuming you have this
+const { Airplane } = require('../airplane.js');
+const { TemooPackage } = require('../package.js');
+const { buildAirportNetwork } = require('../airport_graph_builder.js'); // Assuming you have this
 
 describe('Airplane Unit Tests', () => {
 	const testDistances = [

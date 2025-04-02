@@ -32,7 +32,7 @@ let optimalSolution = {
 
 // Find the solution
 const optimalDeliverySchedule = scheduleDeliveries(packages, planes, 0, optimalSolution);
-printSolution(optimalDeliverySchedule, airportNetwork, numOfPackages);
+printSolution(optimalDeliverySchedule, airportNetwork);
 
 /**
  * Prints the solution
@@ -41,17 +41,15 @@ printSolution(optimalDeliverySchedule, airportNetwork, numOfPackages);
  * @param {object} airportNetwork - An object representing the airport network with connections.
  * @param {Number} numOfPackages  - Number of packages that were delivered
  */
-function printSolution(optimalDeliverySchedule, airportNetwork, numOfPackages) {
+function printSolution(optimalDeliverySchedule, airportNetwork) {
 	const deliveryPlan = optimalDeliverySchedule.optimalPlaneConfig;
 	const report = [];
 
 	report.push('=== DELIVERY SOLUTION ===');
 	report.push(`Number of  Valid Solutions: ${optimalDeliverySchedule.validSolutionsCount}`);
 	report.push(`Number of Nodes Explored: ${optimalDeliverySchedule.totalNodesExplored}`);
-
-	// If a solution was not found
-	if (!optimalDeliverySchedule.optimalPlaneConfig) {
-		report.push('No solution found.');
+	if (optimalDeliverySchedule.validSolutionsCount === 0) {
+		report.push('No Solution found');
 		console.log(report.join('\n'));
 		return;
 	}
@@ -63,15 +61,14 @@ function printSolution(optimalDeliverySchedule, airportNetwork, numOfPackages) {
 	report.push('Airplane Assignments');
 	report.push('====================');
 
-
 	// Each Airplane's Details
 	deliveryPlan.forEach((airplane, index) => {
 		report.push(`--- AIRPLANE ${index} ---`);
 		report.push(`Total Load: ${airplane.currentLoad} kg `);
 		report.push(`Total Distance Traveled: ${airplane.totalDistance} km`);
 		// this plane was not used so just print the load and distance travelled
-		if(airplane.packages.length === 0) {
-			console.log(report.join('\n'));
+		if (airplane.packages.length === 0) {
+			report.push('\n');
 			return;
 		}
 		report.push(`Departure Time: ${formatTime(airplane.departureTimeOrigin)} (HH:MM)`);
