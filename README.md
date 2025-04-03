@@ -14,14 +14,13 @@ Welcome to the **TEMOO Cargo** expedited shipping service simulator! This projec
 6. [Output & Results](#output--results)
 7. [Project Structure](#project-structure)
 8. [Testing](#testing)
-9. [Contributing](#contributing)
-10. [License](#license)
+9. [Performance Benchmarking](#performance-benchmarking)
 
 ---
 
 ## Project Overview
 
-TEMOO Cargo is an expedited cargo delivery system that schedules cargo planes from a central hub airport to various destinations. Packages have arrival times, deadlines, and weights. A limited number of planes operate round-trip flights from the hub to distribute packages while complying with constraints on:
+TEMOO Cargo is an expedited cargo delivery system that schedules cargo planes from a central hub airport to various destinations. Packages have arrival times, deadlines, and weights. A limited number of planes operate flights from the hub to distribute packages while complying with constraints on:
 
 - Plane weight capacity
 - Fuel/speed limitations
@@ -142,7 +141,7 @@ The Haskell implementation demonstrates the power of functional programming for 
 - **Details**: [Haskell Implementation README](./Haskell/README.md)
 - **Testing**: [Haskell Testing Documentation](./Haskell/tests.md)
 
-Both implementations share the same algorithm approach : Recursive backtrackingn with branch and bound
+Both implementations share the same algorithm approach and produce compatible results, but each has its own strengths and optimization techniques.
 
 ---
 
@@ -190,16 +189,19 @@ The project is organized into several main directories:
 
 - `./Javascript/` - Contains the Node.js implementation
 
-  - `./Javascript/unit_tests/` - Unit tests for JavaScript implementation
+  - `./Javascript/tests/` - Unit tests for JavaScript implementation
   - `./Javascript/runAllTestCases.sh` - Script to run all integration tests
 
 - `./Haskell/` - Contains the Haskell implementation
 
-  - `./Haskell/unit_tests/` - Unit tests for Haskell implementation
+  - `./Haskell/tests/unit_tests/` - Unit tests for Haskell implementation
   - `./Haskell/tests/integration_tests/` - Integration test files for Haskell
   - `./Haskell/compileAndRunTests.sh` - Script to run all integration tests
 
-- `./testFiles/` - Contains common test cases used by both JavaScript and Haskell implementation
+- `./testFiles/` - Contains common test cases used by the JavaScript implementation
+
+- `./Other/` - Contains additional tools and documentation
+  - `./Other/Python/` - Performance benchmarking tools
 
 For specific details about each implementation's internal structure, please refer to their respective README files linked above.
 
@@ -219,7 +221,24 @@ The project includes 16 standard test cases that exercise different aspects of t
 4. Multiple destinations with deadlines
 5. Complex multi-package, multi-plane scenarios
 
+### Test Files Location
+
+- **JavaScript tests**: Located in `./testFiles/` with test runner in `./Javascript/runAllTestCases.sh`
+- **Haskell tests**: Located in `./Haskell/tests/integration_tests/` with test runner in `./Haskell/compileAndRunTests.sh`
+
 ### Test Documentation
 
 - [JavaScript Testing Documentation](./Javascript/tests.md)
 - [Haskell Testing Documentation](./Haskell/tests.md)
+
+Each testing document provides detailed explanations of each test case, expected outcomes, and how to run the tests.
+
+---
+
+## Performance Benchmarking
+
+The project includes Python-based benchmarking tools to compare the performance of the JavaScript and Haskell implementations in the `root/Other`:
+
+### [Python Benchmarking Tools](./Other/Python/README.md)
+
+---
