@@ -19,7 +19,7 @@ All the test cases outlined passed/match expected outcomes. The integration test
 - **Note:** Unit test coverage is minimal for the Haskell implementation
 - **To Run, Type the following in a terminal while in the Haskell solution directory**:
   ```bash
-  ./runUnitTests.sh
+  bash ./runUnitTests.sh
   ```
 
 ### Integration Tests

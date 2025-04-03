@@ -10,38 +10,7 @@ This is the Haskell implementation of the TEEMO Cargo optimization system, provi
 
 - **Cabal** ([Install guide](https://www.haskell.org/cabal/))
 - **GHCup** ([Install guide](https://www.haskell.org/ghcup/))
-
-### Installing Prerequisites
-
-1. **Install GHCup** (Haskell toolchain installer)
-
-   ```bash
-   # macOS/Linux
-   curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
-
-   # Windows
-   # Download the installer from https://www.haskell.org/ghcup/
-   ```
-
-2. **Install GHC** (Glasgow Haskell Compiler)
-
-   ```bash
-   ghcup install ghc
-   ghcup set ghc
-   ```
-
-3. **Install Cabal**
-
-   ```bash
-   ghcup install cabal
-   ghcup set cabal
-   ```
-
-4. **Install Project Dependencies**
-   ```bash
-   cabal update
-   cabal install --only-dependencies
-   ```
+- **Ghc**([Install guide](https://www.haskell.org/ghc/))
 
 ## How to Build and Run
 
@@ -89,7 +58,7 @@ cabal run AirplaneGraphProject -- <pathToDistanceMatrix> <pathToPkgData> <pathTo
 
 ### Option 2: Using the Compiled Executable
 
-If moved to `./build/` as suggested, run:
+If moved to `./build/`, run:
 
 ```bash
 ./build/AirplaneGraphProject <pathToDistanceMatrix> <pathToPkgData> <pathToConstraintsFile>
@@ -104,13 +73,13 @@ Or, if using the default location:
 ## Example Usage
 
 ```bash
-cabal run AirplaneGraphProject -- ./sample_input_files/sample_distance_matrix.json ./sample_input_files/data/sample_packages.json ./sample_input_files/data/sample_constraints.json
+cabal run AirplaneGraphProject -- ../testFiles/3/3_dist.json ../testFiles/3/3_pkg.json ../testFiles/3/3_constraints.json
 ```
 
 Or with the executable:
 
 ```bash
-./build/AirplaneGraphProject ./sample_input_files/sample_distance_matrix.json ./sample_input_files/data/sample_packages.json ./sample_input_files/data/sample_constraints.json
+./build/AirplaneGraphProject ../testFiles/3/3_dist.json ../testFiles/3/3_pkg.json ../testFiles/3/3_constraints.json
 ```
 
 ## More Documentation

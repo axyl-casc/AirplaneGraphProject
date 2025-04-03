@@ -1,7 +1,7 @@
 
 echo ""
 echo "Running test case 1..."
-node main.js ../testFiles/tests/1/1_dist.json ../testFiles/tests/1/1_pkg.json ../testFiles/tests/1/1_constraints.json
+node main.js ../testFiles/1/1_dist.json ../testFiles/1/1_pkg.json ../testFiles/1/1_constraints.json
 echo ""
 echo "Running test case 2..."
 node main.js ../testFiles/2/2_dist.json ../testFiles/2/2_pkg.json ../testFiles/2/2_constraints.json
