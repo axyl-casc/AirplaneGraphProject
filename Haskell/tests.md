@@ -5,7 +5,7 @@ All the test cases outlined passed/match expected outcomes. The integration test
 
 ## Prerequisites
 
-- Ensure that the necessary dependencies are installed (refer to the main [README.md](./README.md) if needed)
+- Ensure that the necessary dependencies are installed (refer to the Haskell Implementation [README.md](./README.md) if needed)
 
 ## External Libraries Used
 

@@ -1,10 +1,10 @@
 # TEEMO Cargo - JavaScript Version
 
-This is the JavaScript implementation of the TEEMO Cargo optimization system, providing efficient route planning and package distribution.
+This is the JavaScript implementation of the **TEMOO Cargo** shipping service simulator.
 
 ## External Libraries
 
-- **Jest** - Testing framework for unit Testing
+- **Jest** - Testing framework for Unit Testing
 
 ## Prerequisites
 

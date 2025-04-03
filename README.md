@@ -1,6 +1,6 @@
 # Teemo Cargo
 
-Welcome to the **TEMOO Cargo** expedited shipping service simulator! This project demonstrates how to schedule and route cargo plane deliveries to various airports, subject to constraints such as weight capacity, flight distances, and package deadlines. The project includes both Haskell and JavaScript implementations with the same core functionality.
+Welcome to the **TEMOO Cargo** shipping service simulator! This project demonstrates how to schedule and route cargo plane deliveries to various airports, subject to constraints such as weight capacity, flight distances, and package deadlines. The project includes both Haskell and JavaScript implementations with the same core functionality.
 
 ---
 
@@ -129,19 +129,15 @@ This project provides two separate implementations of the TEMOO Cargo scheduler:
 
 ### [JavaScript (Node.js) Implementation](./Javascript/README.md)
 
-The JavaScript implementation provides a web-friendly, easily deployable solution with good performance for moderate-sized problems.
-
 - **Details**: [JavaScript Implementation README](./Javascript/README.md)
 - **Testing**: [JavaScript Testing Documentation](./Javascript/tests.md)
 
 ### [Haskell Implementation](./Haskell/README.md)
 
-The Haskell implementation demonstrates the power of functional programming for solving complex optimization problems.
-
 - **Details**: [Haskell Implementation README](./Haskell/README.md)
 - **Testing**: [Haskell Testing Documentation](./Haskell/tests.md)
 
-Both implementations share the same algorithm approach and produce compatible results, but each has its own strengths and optimization techniques.
+Both implementations share the same algorithm approach and produce the same results. However, the haskell solution is significantly faster as the search space increase.
 
 ---
 
@@ -190,26 +186,22 @@ The project is organized into several main directories:
 - `./Javascript/` - Contains the Node.js implementation
 
   - `./Javascript/tests/` - Unit tests for JavaScript implementation
-  - `./Javascript/runAllTestCases.sh` - Script to run all integration tests
+  - `./Javascript/runAllTestCases.sh` - Bash script to run all integration tests
 
 - `./Haskell/` - Contains the Haskell implementation
 
   - `./Haskell/tests/unit_tests/` - Unit tests for Haskell implementation
-  - `./Haskell/tests/integration_tests/` - Integration test files for Haskell
-  - `./Haskell/compileAndRunTests.sh` - Script to run all integration tests
+  - `./Haskell/compileAndRunALLTests.sh` - Bash script to run all integration tests
 
-- `./testFiles/` - Contains common test cases used by the JavaScript implementation
+- `./testFiles/` - Contains common test cases used by both the Javascript and Haskell implementation
 
-- `./Other/` - Contains additional tools and documentation
-  - `./Other/Python/` - Performance benchmarking tools
+  - `./Other/` - Performance benchmarking tool in Python
 
 For specific details about each implementation's internal structure, please refer to their respective README files linked above.
 
 ---
 
 ## Testing
-
-Both implementations include comprehensive testing to ensure correctness and performance:
 
 ### Integration Testing
 
@@ -223,21 +215,20 @@ The project includes 16 standard test cases that exercise different aspects of t
 
 ### Test Files Location
 
-- **JavaScript tests**: Located in `./testFiles/` with test runner in `./Javascript/runAllTestCases.sh`
-- **Haskell tests**: Located in `./Haskell/tests/integration_tests/` with test runner in `./Haskell/compileAndRunTests.sh`
+- Located in `./testFiles/`
+- **JavaScript tests**: Script in `./Javascript/runAllTestCases.sh` to run all tests
+- **Haskell tests**: Script in `./Haskell/compileAndRunALLTests.sh` to run all tests
 
 ### Test Documentation
 
 - [JavaScript Testing Documentation](./Javascript/tests.md)
 - [Haskell Testing Documentation](./Haskell/tests.md)
 
-Each testing document provides detailed explanations of each test case, expected outcomes, and how to run the tests.
-
 ---
 
 ## Performance Benchmarking
 
-The project includes Python-based benchmarking tools to compare the performance of the JavaScript and Haskell implementations in the `root/Other`:
+The project includes Python-based benchmarking tool to compare the performance of the JavaScript and Haskell implementations in the `root/Other`:
 
 ### [Python Benchmarking Tools](./Other/Python/README.md)
 

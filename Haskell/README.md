@@ -1,6 +1,6 @@
 # TEMOO Cargo – Haskell Version
 
-This is the Haskell implementation of the TEEMO Cargo optimization system, providing efficient route planning and package distribution.
+This is the Haskell implementation of the **TEMOO Cargo** shipping service simulator.
 
 ## External Libraries
 
