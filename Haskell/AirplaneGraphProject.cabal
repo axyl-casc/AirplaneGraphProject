@@ -5,8 +5,6 @@ license: BSD-3-Clause
 license-file: LICENSE
 author: Depanshu, Kevin, Axyl
 maintainer: 122829642+Suya678@users.noreply.github.com
-builddir: build
-
 build-type: Simple
 common deps
   build-depends:       base,
@@ -45,6 +43,6 @@ executable AirplaneGraphProject
 executable AirportNetworkTest
   import:              deps
   main-is:             AirportNetworkTest.hs
-  hs-source-dirs:      tests/unit_tests/
+  hs-source-dirs:      unit_tests/
   build-depends:       AirplaneGraphProject
 

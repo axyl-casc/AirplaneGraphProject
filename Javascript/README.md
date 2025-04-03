@@ -1,7 +1,5 @@
 # TEEMO Cargo - JavaScript Version
 
-> Modern cargo optimization for efficient logistics
-
 This is the JavaScript implementation of the TEEMO Cargo optimization system, providing efficient route planning and package distribution.
 
 ## External Libraries

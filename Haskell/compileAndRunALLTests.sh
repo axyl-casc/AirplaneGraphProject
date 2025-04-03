@@ -48,6 +48,7 @@ echo "Running test case 15..."
 cabal run AirplaneGraphProject -- ../testFiles/15/15_dist.json ../testFiles/15/15_pkg.json ../testFiles/15/15_constraints.json
 echo ""
 echo "Running test case 16..."
+echo "This one might take a while..."
 cabal run AirplaneGraphProject -- ../testFiles/16/16_dist.json ../testFiles/16/16_pkg.json ../testFiles/16/16_constraints.json
 echo ""
 echo "All tests completed!"

@@ -1,50 +1,128 @@
 # TEMOO Cargo – Haskell Version
 
-Welcome to the TEMOO Cargo expedited shipping service simulator, implemented in **Haskell**. This tool determines optimal or near-optimal routes for delivering packages from a central hub airport to other Canadian destinations, respecting constraints such as aircraft capacity, package deadlines, and flight distance.
+This is the Haskell implementation of the TEEMO Cargo optimization system, providing efficient route planning and package distribution.
 
+## External Libraries
+
+- **Aeson** - For Parsing Json input files
+
+## Prerequisites
+
+- **Cabal** ([Install guide](https://www.haskell.org/cabal/))
+- **GHCup** ([Install guide](https://www.haskell.org/ghcup/))
+
+### Installing Prerequisites
+
+1. **Install GHCup** (Haskell toolchain installer)
+
+   ```bash
+   # macOS/Linux
+   curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
+
+   # Windows
+   # Download the installer from https://www.haskell.org/ghcup/
+   ```
+
+2. **Install GHC** (Glasgow Haskell Compiler)
+
+   ```bash
+   ghcup install ghc
+   ghcup set ghc
+   ```
+
+3. **Install Cabal**
+
+   ```bash
+   ghcup install cabal
+   ghcup set cabal
+   ```
+
+4. **Install Project Dependencies**
+   ```bash
+   cabal update
+   cabal install --only-dependencies
+   ```
 
 ## How to Build and Run
 
 1. **Navigate to the Haskell Directory**
 
-   ```bash
-   cd Haskell
-   ```
+```bash
+cd Haskell
+```
 
 2. **Build the Project Using Cabal**
 
-   ```bash
-   cabal clean
-   cabal build
-   ```
+```bash
+cabal clean
+cabal build
+```
+
+### Executable Location
+
+After building, the compiled executable is stored at:
+
+```
+./dist-newstyle/build/<arch>-<os>/ghc-<ghc_version>/AirplaneGraphProject-0.1.0.0/x/AirplaneGraphProject/build/AirplaneGraphProject/AirplaneGraphProject
+```
+
+To find the exact location dynamically, run:
+
+```bash
+cabal list-bin exe:AirplaneGraphProject
+```
+
+Alternatively, you can move the executable to a custom location using:
+
+```bash
+mkdir -p build
+mv "$(cabal list-bin exe:AirplaneGraphProject)" ./build/AirplaneGraphProject
+```
 
 3. **Run the Program**
 
-   ```bash
-   ./AirplaneGraphProject testcases/distance_matrix_01.json testcases/package_data_01.json testcases/constraints_01.json
-   ```
+### Option 1: Using the Cabal Runner
 
-   > Note: The executable name may vary depending on how it's configured in the `.cabal` file.
+```bash
+cabal run AirplaneGraphProject -- <pathToDistanceMatrix> <pathToPkgData> <pathToConstraintsFile>
+```
 
-## Input Format
+### Option 2: Using the Compiled Executable
 
-- **Distance Matrix (distance_matrix.json)**: A square matrix of distances. `-1` indicates no direct route.
-- **Package Data (package_data.json)**: Each entry contains a package's ID, weight, arrival time, deadline, and destination.
-- **Constraints (constraints.json)**: Includes `numOfPlanes`, `weightCapacity`, and `speed`.
+If moved to `./build/` as suggested, run:
 
-## Output
+```bash
+./build/AirplaneGraphProject <pathToDistanceMatrix> <pathToPkgData> <pathToConstraintsFile>
+```
 
-- Displays results in the console, including:
-  - Total distance flown
-  - Number of planes used
-  - Per-plane delivery schedule
-  - Confirmation that all packages are delivered within deadlines
-- May also write output to `solution.txt`, if implemented
+Or, if using the default location:
 
-## Algorithm Overview
+```bash
+./dist-newstyle/build/<arch>-<os>/ghc-<ghc_version>/AirplaneGraphProject-0.1.0.0/x/AirplaneGraphProject/build/AirplaneGraphProject/AirplaneGraphProject <pathToDistanceMatrix> <pathToPkgData> <pathToConstraintsFile>
+```
 
-- Uses a branch-and-cut or backtracking method to explore feasible plane routes
-- Graph analysis uses algorithms like Floyd–Warshall or Dijkstra for shortest path calculations
-- Scheduler ensures each plane's weight and time constraints are respected
+## Example Usage
 
-Refer to the general project README for a full overview and JavaScript counterpart.
+```bash
+cabal run AirplaneGraphProject -- ./sample_input_files/sample_distance_matrix.json ./sample_input_files/data/sample_packages.json ./sample_input_files/data/sample_constraints.json
+```
+
+Or with the executable:
+
+```bash
+./build/AirplaneGraphProject ./sample_input_files/sample_distance_matrix.json ./sample_input_files/data/sample_packages.json ./sample_input_files/data/sample_constraints.json
+```
+
+## More Documentation
+
+For detailed information about:
+
+- Input/output formats
+- Algorithm implementation details
+- Performance benchmarks
+- Comparison with Javascript implementation
+  Please refer to the [general project README](../README.md).
+
+## Testing
+
+Please refer to the [Testing Document](./tests.md).

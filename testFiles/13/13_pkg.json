@@ -1,3 +1,10 @@
 [
-	{ "id": 1, "weight": 250, "arrivalTime": "08:00", "deadlineTime": "10:00", "destination": 1, "extra": "fakedata" }
+  {
+    "id": 1,
+    "weight": 250,
+    "arrivalTime": "a",
+    "deadlineTime": "10:00",
+    "destination": 1,
+    "extra": "fakedata"
+  }
 ]
