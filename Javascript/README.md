@@ -27,7 +27,8 @@ This is the JavaScript implementation of the TEEMO Cargo optimization system, pr
 ## Example Usage
 
 ```bash
-node main ./sample_input_files/sample_distance_matrix.json ./sample_input_files/data/sample_packages.json ./sample_input_files/data/sample_constraints.json
+node main.js ../testFiles/4/4_dist.json ../testFiles/4/4_pkg.json ../testFiles/4/4_constraints.json
+
 ```
 
 ## More Documentation
@@ -36,11 +37,9 @@ For detailed information about:
 
 - Input/output formats
 - Algorithm implementation details
-- Performance benchmarks
-- Comparison with Haskell implementation
 
-Please refer to the [general project README](../README.md).
+Refer to the [general project README](../README.md).
 
 ## Testing
 
-Please refer to the [Testing Document](./tests.md)
+Refer to the [Testing Document](./tests.md)

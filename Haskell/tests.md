@@ -44,7 +44,7 @@ cabal run AirplaneGraphProject -- ../testFiles/[test_case_number]/[test_case_num
 ### Example:
 
 ```bash
-cabal run AirplaneGraphProject -- ../testFiles/9/9_dist.json ../testFiles/9/9_pkg.json ../testFiles/9/9_constraints.json
+cabal run AirplaneGraphProject -- ../testFiles/4/4_dist.json ../testFiles/4/4_pkg.json ../testFiles/4/4_constraints.json
 ```
 
 A convenience script is provided to run all test cases in sequence:

@@ -119,10 +119,9 @@ For detailed information about:
 
 - Input/output formats
 - Algorithm implementation details
-- Performance benchmarks
-- Comparison with Javascript implementation
-  Please refer to the [general project README](../README.md).
+
+  Refer to the [general project README](../README.md).
 
 ## Testing
 
-Please refer to the [Testing Document](./tests.md).
+Refer to the [Testing Document](./tests.md).

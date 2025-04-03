@@ -46,7 +46,7 @@ node main.js ../testFiles/[test_case_number]/[test_case_number]_dist.json ../tes
 ### Example:
 
 ```bash
-node main.js ../testFiles/9/9_dist.json ../testFiles/9/9_pkg.json ../testFiles/9/9_constraints.json
+node main.js ../testFiles/4/4_dist.json ../testFiles/4/4_pkg.json ../testFiles/4/4_constraints.json
 ```
 
 A convenience script is provided to run all test cases in sequence:
@@ -296,5 +296,3 @@ node main.js ../testFiles/16/16_dist.json ../testFiles/16/16_pkg.json ../testFil
 ```
 
 **Expected outcome:** A valid solution that efficiently routes all packages.
-
-**Note:** This test case may take longer to complete depending on hardware performance.
