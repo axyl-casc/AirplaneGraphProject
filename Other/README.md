@@ -62,5 +62,3 @@ python generate_graphs.py
 - The graph helps visualize how each implementation scales with problem size
 
 ---
-
-This script provides a fast and visual way to compare the performance and scalability of the JavaScript and Haskell versions of TEMOO Cargo.
