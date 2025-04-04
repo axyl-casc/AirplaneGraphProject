@@ -22,7 +22,10 @@ cd Haskell
 
 2. **Build the Project Using Cabal**
 
+- **Note**:Building takes a while even though not many external packages are used. So,be patient.
+
 ```bash
+cabal update
 cabal clean
 cabal build
 ```
